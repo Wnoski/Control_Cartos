@@ -1,0 +1,32 @@
+:root {
+  --cc-green: #2ecc71;
+  --cc-green-dark: #27ae60;
+  --cc-dark: #0f1117;
+  --cc-surface: #181c24;
+  --cc-surface2: #1e2330;
+  --cc-text: #e8eaf0;
+  --cc-muted: #8a8fa8;
+  --cc-accent: #f5a623;
+  --font-main: "Sora", sans-serif;
+  --font-body: "DM Sans", sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  background-color: var(--cc-dark);
+}
+
+.img_logo {
+  height: 40px;
+  width: auto;
+  border-radius: 10px;
+}
+
+.img_carousel {
+  height: 50vh;
+  object-fit: cover;
+  width: 100%;
+}
