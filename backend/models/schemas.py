@@ -13,4 +13,7 @@ class RegisterRequest(BaseModel):
 class CambioRequest(BaseModel):
     new_password: str
     confirm_password: str
-    
+
+class CategoriaRequest(BaseModel):
+    nombre: str
+    monto_maximo: float
