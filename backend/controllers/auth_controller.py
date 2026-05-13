@@ -11,7 +11,8 @@ def usuario_login(email, password):
             "usuario": {
                 "id": usuario["id"],
                 "nombre_usuario": usuario["nombre_usuario"],
-                "email": usuario["email"]
+                "email": usuario["email"],
+                "token": usuario["token"]
             }
         }
     
