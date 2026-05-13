@@ -6,7 +6,12 @@ import os
 security = HTTPBearer()
 
 def verificar_token(credentials: HTTPAuthorizationCredentials = Depends(security)):
-    token = credentials.credentials
-    # decodificar el token
-    # extraer el id
-    # devolver el id
+    try:
+        token = credentials.credentials
+        payload = jwt.decode(token, os.getenv("SECRET_KEY"), algorithms=["HS256"])
+        print(payload["id"])
+        return payload["id"]
+    except ExpiredSignatureError:
+        raise HTTPException(status_code=401, detail="Token expirado")
+    except JWTError:
+        raise HTTPException(status_code=401, detail="Token inválido")
