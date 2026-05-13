@@ -1,12 +1,12 @@
-from fastapi import APIRouter, Depends
-from controllers import auth_controller, categoria_controller, gastos_controller
-from models.schemas import LoginRequest, RegisterRequest, CambioRequest, CategoriaRequest, GastosRequest
+from fastapi import APIRouter, Depends, UploadFile, File
+from controllers import auth_controller, categoria_controller, gastos_controller, perfil_controller
+from models.schemas import LoginRequest, RegisterRequest, CambioRequest, CategoriaRequest, GastosRequest, NicknameRequest, EmailRequest, PasswordRequest, PresupuestoRequest
 from utils.auth import verificar_token
 
 router_usuario = APIRouter()
 
 
-#USERS
+#USER
 @router_usuario.post("/login")
 def usuario_login(datos: LoginRequest):
     return auth_controller.usuario_login(datos.email, datos.password)
@@ -63,3 +63,37 @@ def crear_gasto(datos: GastosRequest, user_id: int = Depends(verificar_token)):
 @router_gastos.delete("/{gasto_id}")
 def eliminar_gasto(gasto_id: int, user_id: int = Depends(verificar_token)):
     return gastos_controller.eliminar_gasto_de_usuario(gasto_id, user_id)
+
+
+#PERFIL USUARIOS
+
+router_perfil = APIRouter()
+
+@router_perfil.get("/")
+def obtener_perfil(user_id: int = Depends(verificar_token)):
+    return perfil_controller.obtener_perfil(user_id)
+
+@router_perfil.put("/nickname")
+def cambiar_nickname(datos: NicknameRequest, user_id: int = Depends(verificar_token)):
+    return perfil_controller.cambiar_nickname(user_id, datos.nickname)
+
+@router_perfil.put("/email")
+def cambiar_email(datos: EmailRequest, user_id: int = Depends(verificar_token)):
+    return perfil_controller.cambiar_email(user_id, datos.email)
+
+@router_perfil.put("/password")
+def cambiar_password(datos: PasswordRequest, user_id: int = Depends(verificar_token)):
+    return perfil_controller.cambiar_password(user_id, datos.actual_password, datos.new_password, datos.confirm_password)
+
+@router_perfil.put("/presupuesto")
+def cambiar_presupuesto(datos: PresupuestoRequest, user_id: int = Depends(verificar_token)):
+    return perfil_controller.cambiar_presupuesto(user_id, datos.presupuesto)
+
+@router_perfil.put("/foto")
+def cambiar_foto(user_id: int = Depends(verificar_token), foto: UploadFile = File(...)):
+    return perfil_controller.cambiar_foto(user_id, foto)
+
+@router_perfil.delete("/")
+def eliminar_cuenta(user_id: int = Depends(verificar_token)):
+    return perfil_controller.eliminar_cuenta(user_id)
+

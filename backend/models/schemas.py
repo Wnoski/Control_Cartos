@@ -23,3 +23,17 @@ class GastosRequest(BaseModel):
     nombre_categoria: str
     monto: float
     descripcion: str | None = None
+    
+class NicknameRequest(BaseModel):
+    nickname: str
+
+class EmailRequest(BaseModel):
+    email: str
+
+class PasswordRequest(BaseModel):
+    actual_password: str
+    new_password: str
+    confirm_password: str
+
+class PresupuestoRequest(BaseModel):
+    presupuesto: float

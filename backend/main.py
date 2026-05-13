@@ -15,6 +15,8 @@ app.include_router(router_categoria, prefix="/usuario/categorias", tags=["Catego
 
 app.include_router(router_gastos, prefix="/usuario/gastos", tags=["Gastos"])
 
+app.include_router(router_perfil, prefix="/perfil", tags=["Perfil"])
+
 @app.get("/")
 def root():
     return {"Server funcionando"}
