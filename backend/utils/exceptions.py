@@ -16,3 +16,6 @@ class UsuarioNoExiste(Exception):
 
 class PasswordNoCoinciden(Exception):
     pass
+
+class CategoriaNoExiste(Exception):
+    pass

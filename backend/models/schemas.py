@@ -1,5 +1,6 @@
 from pydantic import BaseModel
 
+
 class LoginRequest(BaseModel):
     email: str
     password: str
@@ -17,3 +18,8 @@ class CambioRequest(BaseModel):
 class CategoriaRequest(BaseModel):
     nombre: str
     monto_maximo: float
+    
+class GastosRequest(BaseModel):
+    nombre_categoria: str
+    monto: float
+    descripcion: str | None = None

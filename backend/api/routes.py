@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends
-from controllers import auth_controller, categoria_controller
-from models.schemas import LoginRequest, RegisterRequest, CambioRequest, CategoriaRequest
+from controllers import auth_controller, categoria_controller, gastos_controller
+from models.schemas import LoginRequest, RegisterRequest, CambioRequest, CategoriaRequest, GastosRequest
 from utils.auth import verificar_token
 
 router_usuario = APIRouter()
@@ -50,14 +50,16 @@ def eliminar_categoria(categoria_id: int, user_id: int = Depends(verificar_token
 
 #GASTOS
 
-@router_categoria.get("/")
-def obtener_categorias(user_id: int = Depends(verificar_token)):
-    return categoria_controller.obtener_categorias_de_usuario(user_id)
+router_gastos = APIRouter()
 
-@router_categoria.post("/")
-def crear_categoria(datos: CategoriaRequest, user_id: int = Depends(verificar_token)):
-    return categoria_controller.crear_categoria_de_usuario(user_id, datos.nombre, datos.monto_maximo)
+@router_gastos.get("/")
+def obtener_gastos(user_id: int = Depends(verificar_token), nombre_categoria: str | None = None):
+    return gastos_controller.obtener_gastos_de_usuario(user_id, nombre_categoria)
 
-@router_categoria.delete("/{categoria_id}")
-def eliminar_categoria(categoria_id: int, user_id: int = Depends(verificar_token)):
-    return categoria_controller.eliminar_categoria_de_usuario(categoria_id, user_id)
+@router_gastos.post("/")
+def crear_gasto(datos: GastosRequest, user_id: int = Depends(verificar_token)):
+    return gastos_controller.crear_gasto(datos.nombre_categoria, user_id, datos.monto, datos.descripcion)
+
+@router_gastos.delete("/{gasto_id}")
+def eliminar_gasto(gasto_id: int, user_id: int = Depends(verificar_token)):
+    return gastos_controller.eliminar_gasto_de_usuario(gasto_id, user_id)
