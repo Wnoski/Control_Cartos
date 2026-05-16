@@ -77,10 +77,6 @@ def obtener_perfil(user_id: int = Depends(verificar_token)):
 def cambiar_nickname(datos: NicknameRequest, user_id: int = Depends(verificar_token)):
     return perfil_controller.cambiar_nickname(user_id, datos.nickname)
 
-@router_perfil.put("/email")
-def cambiar_email(datos: EmailRequest, user_id: int = Depends(verificar_token)):
-    return perfil_controller.cambiar_email(user_id, datos.email)
-
 @router_perfil.put("/password")
 def cambiar_password(datos: PasswordRequest, user_id: int = Depends(verificar_token)):
     return perfil_controller.cambiar_password(user_id, datos.actual_password, datos.new_password, datos.confirm_password)
@@ -90,8 +86,8 @@ def cambiar_presupuesto(datos: PresupuestoRequest, user_id: int = Depends(verifi
     return perfil_controller.cambiar_presupuesto(user_id, datos.presupuesto)
 
 @router_perfil.put("/foto")
-def cambiar_foto(user_id: int = Depends(verificar_token), foto: UploadFile = File(...)):
-    return perfil_controller.cambiar_foto(user_id, foto)
+async def cambiar_foto(user_id: int = Depends(verificar_token), foto: UploadFile = File(...)):
+    return await perfil_controller.cambiar_foto(user_id, foto)
 
 @router_perfil.delete("/")
 def eliminar_cuenta(user_id: int = Depends(verificar_token)):

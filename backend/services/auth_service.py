@@ -1,7 +1,7 @@
 import os
 import secrets
 from passlib.context import CryptContext
-from models import usuario_model
+from models import usuarios_model
 from utils.exceptions import CredencialesError, CuentaNoVerificadaError, UsuarioNoExiste , TokenInvalido, EmailDuplicado, PasswordNoCoinciden
 from utils import mail
 from jose import jwt, JWTError, ExpiredSignatureError
@@ -12,7 +12,7 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 def usuario_login(email, password):
     try:
-        usuario = usuario_model.buscar_usuario_por_email(email)
+        usuario = usuarios_model.buscar_usuario_por_email(email)
         
         if not usuario or not pwd_context.verify(password, usuario["password"]):
             raise CredencialesError("Credenciales incorrectas")
@@ -41,7 +41,7 @@ async def crear_usuario(datos):
    
     try:
         
-        existe = usuario_model.buscar_usuario_por_email(datos.email)
+        existe = usuarios_model.buscar_usuario_por_email(datos.email)
     
         if existe:
             raise EmailDuplicado("El email ya está registrado")
@@ -50,7 +50,7 @@ async def crear_usuario(datos):
         
         token_verificacion = secrets.token_urlsafe(32)
         print(f"Llamando a crear_usuario con: {datos.nickname}, {datos.email}")
-        nuevo = usuario_model.crear_usuario(
+        nuevo = usuarios_model.crear_usuario(
             nombre_usuario=datos.nickname,
             email=datos.email,
             password=password_hasheado,
@@ -71,7 +71,7 @@ async def crear_usuario(datos):
 
 def verificar_usuario(token):
     try:
-        verificado = usuario_model.verificar_usuario(token)
+        verificado = usuarios_model.verificar_usuario(token)
         if not verificado:
             raise TokenInvalido("El token es invalido o ya ha sido utilizado")
         return verificado
@@ -99,7 +99,7 @@ def crear_token_recuperacion(data:dict):
 
 async def solicitar_recuperacion(email):
     try:
-        usuario = usuario_model.buscar_usuario_por_email(email)
+        usuario = usuarios_model.buscar_usuario_por_email(email)
         
         if not usuario:
             raise UsuarioNoExiste("No existe el usuario")
@@ -126,7 +126,7 @@ def cambiar_contraseña(token, new_password, confirm_password):
         user_id = payload["id"]
         
         new_pass_hasheada = pwd_context.hash(new_password)
-        cambiada = usuario_model.cambiar_contraseña(new_pass_hasheada, user_id)
+        cambiada = usuarios_model.cambiar_contraseña(new_pass_hasheada, user_id)
         
         return cambiada
         
