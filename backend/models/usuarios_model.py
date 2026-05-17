@@ -2,7 +2,7 @@ from config.database import create_connection
 
 
 def buscar_usuario_por_email(email):
-    print(f"Buscando usuario: {email}")
+    
     conexion = create_connection()
      
     if not conexion:
@@ -28,7 +28,7 @@ def crear_usuario(nombre_usuario, email, password, presupuesto, token_verificaci
         return None
     
     try:
-        print(f"En model crear_usuario: {nombre_usuario}, {email}")
+    
         with conexion.cursor() as cursor:
             sql = """INSERT INTO usuarios 
                      (nombre_usuario, email, password, presupuesto_maximo_mensual, token_verificacion) 

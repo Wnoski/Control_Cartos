@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, UploadFile, File
 from controllers import auth_controller, categoria_controller, gastos_controller, perfil_controller, dashboard_controller
-from models.schemas import LoginRequest, RegisterRequest, CambioRequest, CategoriaRequest, GastosRequest, NicknameRequest, EmailRequest, PasswordRequest, PresupuestoRequest
+from models.schemas import LoginRequest, RegisterRequest, CambioRequest, CategoriaRequest, GastosRequest, NicknameRequest, PasswordRequest, PresupuestoRequest, VerificarDuplicado
 from utils.auth import verificar_token
 
 router_usuario = APIRouter()
@@ -26,6 +26,10 @@ async def solicitar_cambio_contraseña(email: str):
 @router_usuario.post("/cambiar/{token}")
 async def solicitar_cambio_contraseña(token: str, datos: CambioRequest):
     return auth_controller.cambiar_contraseña(token, datos.new_password, datos.confirm_password)
+
+@router_usuario.post("/register/duplicado")
+def usuario_regis(datos: VerificarDuplicado):
+    return auth_controller.verificar_duplicado(datos.email)
 
 #CATEGORIAS
 
@@ -95,7 +99,6 @@ def eliminar_cuenta(user_id: int = Depends(verificar_token)):
 
 
 #DASHBOARD
-
 
 router_dashboard = APIRouter()
 

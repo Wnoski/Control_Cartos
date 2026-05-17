@@ -40,6 +40,8 @@ def usuario_login(email, password):
 async def crear_usuario(datos):
    
     try:
+        if datos.password != datos.confirm_password:
+            raise PasswordNoCoinciden("Las contraseñas deben coincidir")
         
         existe = usuarios_model.buscar_usuario_por_email(datos.email)
     
@@ -64,6 +66,12 @@ async def crear_usuario(datos):
         await mail.enviar_mail_verificacion(datos.email, token_verificacion)
         
         return nuevo
+    
+    except EmailDuplicado:
+        raise
+    
+    except PasswordNoCoinciden:
+        raise
 
     except Exception as e:
         print(f"Error en service registro: {e}")

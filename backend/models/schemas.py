@@ -4,12 +4,16 @@ from pydantic import BaseModel
 class LoginRequest(BaseModel):
     email: str
     password: str
-    
+
+class VerificarDuplicado(BaseModel):
+    email: str
+
 class RegisterRequest(BaseModel):
     nickname: str
     email: str
     password: str
-    presupuesto: int
+    confirm_password: str
+    presupuesto: float
 
 class CambioRequest(BaseModel):
     new_password: str
@@ -26,9 +30,6 @@ class GastosRequest(BaseModel):
     
 class NicknameRequest(BaseModel):
     nickname: str
-
-class EmailRequest(BaseModel):
-    email: str
 
 class PasswordRequest(BaseModel):
     actual_password: str

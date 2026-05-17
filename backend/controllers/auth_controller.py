@@ -1,6 +1,7 @@
 from utils.exceptions import CredencialesError, CuentaNoVerificadaError, EmailDuplicado, TokenInvalido, UsuarioNoExiste, PasswordNoCoinciden
 from services import auth_service
 from fastapi import HTTPException
+from models import usuarios_model
 
 
 def usuario_login(email, password):
@@ -25,12 +26,30 @@ def usuario_login(email, password):
     except Exception as e:
         print(f"Error interno {e}")
         raise HTTPException(status_code=500, detail="Error interno del servidor")
+    
+def verificar_duplicado(email):
+    
+    try:
+        existe = usuarios_model.buscar_usuario_por_email(email)
+        
+        if existe:
+            raise EmailDuplicado("Correo ya existe")
+        
+        return {"status": "success", "mensaje": "Usuario creado, revisa tu email"}
+    except EmailDuplicado as e:
+        raise HTTPException(status_code=409, detail=str(e))
+    except Exception:
+        raise HTTPException(status_code=500, detail="Error interno del servidor")
 
 async def crear_usuario(datos):
-    print(f"Entrando al controller con: {datos}")
+   
     try:
         await auth_service.crear_usuario(datos)
         return {"status": "success", "mensaje": "Usuario creado, revisa tu email"}
+    
+    except PasswordNoCoinciden:
+        raise HTTPException(status_code=400, detail=str(e))
+    
     except EmailDuplicado as e:
         raise HTTPException(status_code=409, detail=str(e))
     except Exception:

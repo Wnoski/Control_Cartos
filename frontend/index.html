@@ -27,6 +27,7 @@
     <title>Control Cartos</title>
   </head>
   <body>
+    <!-- NAVBAR ---------------------------- -->
     <nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top">
       <div class="container">
         <a class="navbar-brand d-flex align-items-center" href="#">
@@ -53,15 +54,22 @@
         <div class="collapse navbar-collapse" id="navbarLanding">
           <div
             class="ms-auto d-flex flex-column flex-md-row gap-2 mt-3 mt-md-0"
+            id="inicioRegistro"
           >
-            <a href="#" class="btn btn-sm btn-outline-light">Iniciar Sesión</a>
-            <a href="#" class="btn btn-sm btn-success">Registrarse</a>
+            <a class="btn btn-sm btn-outline-light" id="btnIniciarSesion"
+              >Iniciar Sesión</a
+            >
+            <a class="btn btn-sm btn-success" id="btnRegistrarse"
+              >Registrarse</a
+            >
           </div>
         </div>
       </div>
     </nav>
 
     <!-- NAVBAR ---------------------------- -->
+
+    <!-- CARROUSEL------------------------------ -->
 
     <div id="carouselExampleIndicators" class="carousel slide">
       <div class="carousel-indicators">
@@ -289,5 +297,6 @@
       integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
       crossorigin="anonymous"
     ></script>
+    <script src="js/index.js"></script>
   </body>
 </html>
