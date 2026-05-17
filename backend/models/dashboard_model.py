@@ -58,7 +58,7 @@ def obtener_dashboard_mes_anterior(user_id):
     finally:
         conexion.close()
 
-def obtener_historico_6_meses(user_id):
+def obtener_historico_3_meses(user_id):
     conexion = create_connection()
     
     if not conexion:
@@ -75,7 +75,7 @@ def obtener_historico_6_meses(user_id):
                 FROM gastos g
                 JOIN categorias c ON g.id_categoria = c.id
                 WHERE g.id_usuario = %s
-                    AND g.fecha >= DATE_SUB(CURRENT_DATE(), INTERVAL 6 MONTH)
+                    AND g.fecha >= DATE_SUB(CURRENT_DATE(), INTERVAL 3 MONTH)
                 GROUP BY YEAR(g.fecha), MONTH(g.fecha), c.id, c.categoria
                 ORDER BY YEAR(g.fecha), MONTH(g.fecha)
             """

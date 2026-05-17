@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, UploadFile, File
-from controllers import auth_controller, categoria_controller, gastos_controller, perfil_controller
+from controllers import auth_controller, categoria_controller, gastos_controller, perfil_controller, dashboard_controller
 from models.schemas import LoginRequest, RegisterRequest, CambioRequest, CategoriaRequest, GastosRequest, NicknameRequest, EmailRequest, PasswordRequest, PresupuestoRequest
 from utils.auth import verificar_token
 
@@ -93,3 +93,20 @@ async def cambiar_foto(user_id: int = Depends(verificar_token), foto: UploadFile
 def eliminar_cuenta(user_id: int = Depends(verificar_token)):
     return perfil_controller.eliminar_cuenta(user_id)
 
+
+#DASHBOARD
+
+
+router_dashboard = APIRouter()
+
+@router_dashboard.get("/")
+def obtener_dashboard(user_id: int = Depends(verificar_token)):
+    return dashboard_controller.obtener_dashboard(user_id)
+
+@router_dashboard.get("/mes-anterior")
+def obtener_dashboard_mes_anterior(user_id: int = Depends(verificar_token)):
+    return dashboard_controller.obtener_dashboard_mes_anterior(user_id)
+
+@router_dashboard.get("/historico")
+def obtener_historico(user_id: int = Depends(verificar_token)):
+    return dashboard_controller.obtener_historico(user_id)
