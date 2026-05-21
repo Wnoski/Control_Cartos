@@ -70,6 +70,9 @@ btnRegistrar2.addEventListener("click", async () => {
   if (registrado) {
     card2.classList.add("d-none");
     card3.classList.remove("d-none");
+    setTimeout(() => {
+      window.location.href = "iniciarSesion.html";
+    }, 3500);
   } else {
     new PNotify({
       title: "Error",
@@ -80,7 +83,6 @@ btnRegistrar2.addEventListener("click", async () => {
 });
 
 btnAtras.addEventListener("click", () => {
-  console.log("click atras");
   card2.classList.add("d-none");
   card1.classList.remove("d-none");
 });

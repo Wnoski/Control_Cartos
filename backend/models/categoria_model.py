@@ -1,12 +1,10 @@
 from config.database import create_connection
 
 def obtener_categorias(user_id):
-    conexion = create_connection()
-    
-    if not conexion:
-        return None
     
     try:
+        conexion = create_connection()
+    
         with conexion.cursor() as cursor:
             sql = "SELECT categoria, monto_maximo from categorias WHERE id_usuario = %s"
             cursor.execute(sql, (user_id,)) 
@@ -18,15 +16,13 @@ def obtener_categorias(user_id):
         raise Exception("Error de base de datos")
     
     finally:
-        conexion.close()
+        if conexion:
+            conexion.close()
 
 def crear_categoria(user_id, nombre, monto_maximo):
-    conexion = create_connection()
-    
-    if not conexion:
-        return None
     
     try:
+        conexion = create_connection()
         with conexion.cursor() as cursor:
             sql = "INSERT INTO categorias (categoria, monto_maximo, id_usuario) VALUES (%s, %s, %s)"
             cursor.execute(sql, (nombre, monto_maximo, user_id,)) 
@@ -39,15 +35,13 @@ def crear_categoria(user_id, nombre, monto_maximo):
         raise Exception("Error de base de datos") 
     
     finally:
-        conexion.close() 
+        if conexion:
+            conexion.close() 
 
 def editar_categoria(categoria_id, user_id, nombre, monto_maximo):
-    conexion = create_connection()
-    
-    if not conexion:
-        return None
     
     try:
+        conexion = create_connection()
         with conexion.cursor() as cursor:
             sql = "UPDATE categorias SET categoria = %s, monto_maximo = %s WHERE id= %s AND id_usuario = %s"
             cursor.execute(sql, (nombre, monto_maximo, categoria_id, user_id,)) 
@@ -60,16 +54,14 @@ def editar_categoria(categoria_id, user_id, nombre, monto_maximo):
         raise Exception("Error de base de datos")  
     
     finally:
-        conexion.close()
+        if conexion:
+            conexion.close()
 
 
 def eliminar_categoria(categoria_id, user_id):
-    conexion = create_connection()
-    
-    if not conexion:
-        return None
-    
+     
     try:
+        conexion = create_connection()
         with conexion.cursor() as cursor:
             sql = "DELETE FROM categorias WHERE id = %s AND id_usuario = %s"
             cursor.execute(sql, (categoria_id, user_id,)) 
@@ -82,5 +74,6 @@ def eliminar_categoria(categoria_id, user_id):
         raise Exception("Error de base de datos")  
     
     finally:
-        conexion.close()
+        if conexion:
+            conexion.close()
 

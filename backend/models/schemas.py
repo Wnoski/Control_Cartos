@@ -5,7 +5,7 @@ class LoginRequest(BaseModel):
     email: str
     password: str
 
-class VerificarDuplicado(BaseModel):
+class EmailRequest(BaseModel):
     email: str
 
 class RegisterRequest(BaseModel):

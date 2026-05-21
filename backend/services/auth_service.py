@@ -51,7 +51,6 @@ async def crear_usuario(datos):
         password_hasheado = pwd_context.hash(datos.password)
         
         token_verificacion = secrets.token_urlsafe(32)
-        print(f"Llamando a crear_usuario con: {datos.nickname}, {datos.email}")
         nuevo = usuarios_model.crear_usuario(
             nombre_usuario=datos.nickname,
             email=datos.email,
