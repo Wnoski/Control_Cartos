@@ -100,39 +100,15 @@
 
       <!-- TARJETA PRESUPUESTO GLOBAL -->
       <div class="card bg-dark border-secondary text-white mb-4">
-        <div class="card-body">
-          <h5 class="card-title text-secondary">Presupuesto mensual</h5>
-          <h2 id="totalGastado">--- €</h2>
-          <p class="text-secondary mb-1">
-            de <span id="presupuestoMax">--- €</span>
-          </p>
-          <div class="progress mb-2" style="height: 8px">
-            <div
-              id="barraGlobal"
-              class="progress-bar bg-success"
-              style="width: 0%"
-            ></div>
-          </div>
-          <p id="mensajeGlobal" class="mb-0">---</p>
-        </div>
+        <div class="card-body" id="cardPresupuesto"></div>
       </div>
 
       <!-- TARJETA BARRAS POR CATEGORÍA -->
       <div class="card bg-dark border-secondary text-white mb-4">
         <div class="card-body">
           <h5 class="card-title text-secondary mb-3">Gastos por categoría</h5>
-          <div id="barrasCategorias">
+          <div id="cardCategorias">
             <!-- Se rellena con JS -->
-            <div class="mb-3">
-              <div class="d-flex justify-content-between mb-1">
-                <span>Categoría ejemplo</span>
-                <span>0€ / 100€</span>
-              </div>
-              <div class="progress" style="height: 7px">
-                <div class="progress-bar bg-success" style="width: 0%"></div>
-              </div>
-              <small class="text-secondary">🟢 Vas bien</small>
-            </div>
           </div>
         </div>
       </div>
@@ -148,13 +124,7 @@
               <button class="btn btn-outline-success">3 meses</button>
             </div>
           </div>
-          <div
-            id="grafica"
-            style="height: 200px"
-            class="d-flex align-items-center justify-content-center text-secondary"
-          >
-            <span>Gráfica aquí con Chart.js</span>
-          </div>
+          <canvas id="grafica"> </canvas>
         </div>
       </div>
     </main>
@@ -328,5 +298,7 @@
       integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
       crossorigin="anonymous"
     ></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="js/dashboard.js" defer></script>
   </body>
 </html>

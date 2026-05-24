@@ -27,7 +27,7 @@ def obtener_dashboard(user_id):
             
             resultado_categorias.append({
                 "id": categoria["id"],
-                "categoria": categoria["categoria"],
+                "categoria": categoria["nombre"],
                 "monto_maximo": monto_maximo,
                 "total_gastado": total_gastado,
                 "porcentaje": round(porcentaje, 1),
@@ -71,7 +71,7 @@ def obtener_dashboard_mes_anterior(user_id):
             
             resultado_categorias.append({
                 "id": categoria["id"],
-                "categoria": categoria["categoria"],
+                "categoria": categoria["nombre"],
                 "monto_maximo": monto_maximo,
                 "total_gastado": total_gastado,
                 "porcentaje": round(porcentaje, 1),

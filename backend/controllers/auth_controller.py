@@ -7,6 +7,7 @@ from models import usuarios_model
 def usuario_login(email, password):
     try:
         usuario = auth_service.usuario_login(email, password)
+        
         return {
             "status": "success",
             "usuario": {

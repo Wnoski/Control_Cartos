@@ -6,7 +6,7 @@ def obtener_categorias(user_id):
         conexion = create_connection()
     
         with conexion.cursor() as cursor:
-            sql = "SELECT categoria, monto_maximo from categorias WHERE id_usuario = %s"
+            sql = "SELECT nombre, monto_maximo from categorias WHERE id_usuario = %s"
             cursor.execute(sql, (user_id,)) 
             
             return cursor.fetchall()
@@ -24,7 +24,7 @@ def crear_categoria(user_id, nombre, monto_maximo):
     try:
         conexion = create_connection()
         with conexion.cursor() as cursor:
-            sql = "INSERT INTO categorias (categoria, monto_maximo, id_usuario) VALUES (%s, %s, %s)"
+            sql = "INSERT INTO categorias (nombre, monto_maximo, id_usuario) VALUES (%s, %s, %s)"
             cursor.execute(sql, (nombre, monto_maximo, user_id,)) 
             conexion.commit()
             return cursor.rowcount > 0
@@ -43,7 +43,7 @@ def editar_categoria(categoria_id, user_id, nombre, monto_maximo):
     try:
         conexion = create_connection()
         with conexion.cursor() as cursor:
-            sql = "UPDATE categorias SET categoria = %s, monto_maximo = %s WHERE id= %s AND id_usuario = %s"
+            sql = "UPDATE categorias SET nombre = %s, monto_maximo = %s WHERE id= %s AND id_usuario = %s"
             cursor.execute(sql, (nombre, monto_maximo, categoria_id, user_id,)) 
             conexion.commit()
             return cursor.rowcount > 0

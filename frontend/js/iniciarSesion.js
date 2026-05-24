@@ -44,7 +44,8 @@ async function iniciarSesion(email, password) {
     });
     if (res.ok) {
       const data = await res.json();
-      localStorage.setItem("token", data.token);
+
+      localStorage.setItem("token", data.usuario.token);
       return true;
     }
     return false;

@@ -8,7 +8,7 @@ def obtener_id_categoria(user_id, nombre_categoria):
     
     try:
         with conexion.cursor() as cursor:
-            sql = "SELECT id FROM categorias WHERE id_usuario = %s AND categoria = %s"
+            sql = "SELECT id FROM categorias WHERE id_usuario = %s AND nombre = %s"
             cursor.execute(sql, (user_id, nombre_categoria))
             resultado = cursor.fetchone()
             return resultado["id"] if resultado else None
@@ -26,7 +26,7 @@ def crear_gasto(user_id, categoria_id, monto, descripcion):
     
     try:
         with conexion.cursor() as cursor:
-            sql = """INSERT INTO gastos (id_usuario, id_categoria, gasto, descripcion) 
+            sql = """INSERT INTO gastos (id_usuario, id_categoria, monto_gasto, descripcion) 
                      VALUES (%s, %s, %s, %s)"""
             cursor.execute(sql, (user_id, categoria_id, monto, descripcion))
             conexion.commit()
@@ -47,14 +47,14 @@ def obtener_gastos(user_id, nombre_categoria=None):
     try:
         with conexion.cursor() as cursor:
             if nombre_categoria:
-                sql = """SELECT g.id, g.gasto, g.descripcion, g.fecha, c.categoria 
+                sql = """SELECT g.id, g.monto_gasto, g.descripcion, g.fecha, c.nombre 
                          FROM gastos g JOIN categorias c ON g.id_categoria = c.id
                          WHERE g.id_usuario = %s AND c.categoria = %s"""
                 cursor.execute(sql, (user_id, nombre_categoria))
             else:
-                sql = """SELECT g.id, g.gasto, g.descripcion, g.fecha, c.categoria 
+                sql = """SELECT g.id, g.monto_gasto, g.descripcion, g.fecha, c.nombre 
                          FROM gastos g JOIN categorias c ON g.id_categoria = c.id
-                         WHERE g.id_usuario = %s"""
+                         WHERE g.id_usuario = %s GROUP BY g.id_categoria"""
                 cursor.execute(sql, (user_id,))
             return cursor.fetchall()
     except Exception as e:
