@@ -23,21 +23,32 @@
       href="/imagenes/favicon.png"
       type="image/x-icon"
     />
+    <style>
+      body {
+        font-family: "Sora", sans-serif;
+        background-color: #f8f9fa;
+      }
+    </style>
     <title>Control Cartos — Categorías</title>
   </head>
   <body>
     <!-- NAVBAR -->
     <nav class="navbar navbar-dark bg-dark fixed-top">
       <div class="container-fluid">
-        <a href="dashboard.html" class="btn btn-outline-secondary btn-sm ms-2">
-          <i class="bi bi-arrow-left me-1"></i>Dashboard
-        </a>
-        <a class="navbar-brand d-flex align-items-center" href="dashboard.html">
-          <img src="/imagenes/logo.png" alt="logo" class="me-2 img_logo" />
-          <span class="d-none d-sm-inline"
-            >Control <span class="text-success">Cartos</span></span
+        <div class="d-flex align-items-center gap-2">
+          <a
+            class="navbar-brand d-flex align-items-center"
+            href="dashboard.html"
           >
-        </a>
+            <img src="/imagenes/logo.png" alt="logo" class="me-2 img_logo" />
+            <span class="d-none d-sm-inline"
+              >Control <span class="text-primary">Cartos</span></span
+            >
+          </a>
+          <a href="dashboard.html" class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-arrow-left me-1"></i>Dashboard
+          </a>
+        </div>
         <div class="dropdown">
           <img
             src="/imagenes/avatar.png"
@@ -75,21 +86,17 @@
     <!-- MAIN -->
     <main class="container mt-5 pt-4">
       <div class="d-flex justify-content-between align-items-center mb-4">
-        <h4 class="text-white mb-0">Mis categorías</h4>
-        <button
-          class="btn btn-success btn-sm"
-          data-bs-toggle="modal"
-          data-bs-target="#modalAgregarCategoria"
-        >
+        <h4 class="mb-0">Mis categorías</h4>
+        <button class="btn btn-primary btn-sm" id="btnAbrirAgregarCategoria">
           <i class="bi bi-plus-circle me-1"></i>Agregar categoría
         </button>
       </div>
 
       <!-- TABLA CATEGORIAS -->
-      <div class="card bg-dark border-secondary text-white">
+      <div class="card shadow-sm border-0">
         <div class="card-body p-0">
-          <table class="table table-dark table-hover mb-0">
-            <thead>
+          <table class="table table-hover mb-0">
+            <thead class="table-light">
               <tr>
                 <th>Categoría</th>
                 <th>Límite mensual</th>
@@ -98,26 +105,6 @@
             </thead>
             <tbody id="tablaCategorias">
               <!-- Se rellena con JS -->
-              <tr>
-                <td>Alimentación</td>
-                <td>400 €</td>
-                <td class="text-end">
-                  <button
-                    class="btn btn-outline-warning btn-sm me-1"
-                    data-bs-toggle="modal"
-                    data-bs-target="#modalEditarCategoria"
-                  >
-                    <i class="bi bi-pencil"></i>
-                  </button>
-                  <button
-                    class="btn btn-outline-danger btn-sm"
-                    data-bs-toggle="modal"
-                    data-bs-target="#modalEliminarCategoria"
-                  >
-                    <i class="bi bi-trash"></i>
-                  </button>
-                </td>
-              </tr>
             </tbody>
           </table>
         </div>
@@ -132,8 +119,8 @@
       aria-hidden="true"
     >
       <div class="modal-dialog">
-        <div class="modal-content bg-dark text-white border-secondary">
-          <div class="modal-header border-secondary">
+        <div class="modal-content">
+          <div class="modal-header bg-primary text-white">
             <h5 class="modal-title">Agregar categoría</h5>
             <button
               type="button"
@@ -142,27 +129,31 @@
             ></button>
           </div>
           <div class="modal-body">
-            <div class="mb-3">
-              <label class="form-label">Nombre</label>
-              <input
-                type="text"
-                class="form-control bg-dark text-white border-secondary"
-                id="nuevaCategoriaNombre"
-                placeholder="Ej: Alimentación"
-              />
-            </div>
-            <div class="mb-3">
-              <label class="form-label">Límite mensual</label>
-              <input
-                type="number"
-                class="form-control bg-dark text-white border-secondary"
-                id="nuevaCategoriaMonto"
-                placeholder="0.00"
-                step="0.01"
-              />
-            </div>
+            <form id="formAgregarCategoria">
+              <div class="mb-3">
+                <label class="form-label">Nombre</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  name="nombre"
+                  placeholder="Ej: Alimentación"
+                  required
+                />
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Límite mensual</label>
+                <input
+                  type="number"
+                  class="form-control"
+                  name="monto_maximo"
+                  placeholder="0.00"
+                  step="0.01"
+                  required
+                />
+              </div>
+            </form>
           </div>
-          <div class="modal-footer border-secondary">
+          <div class="modal-footer">
             <button
               type="button"
               class="btn btn-outline-secondary"
@@ -171,8 +162,9 @@
               Cancelar
             </button>
             <button
-              type="button"
-              class="btn btn-success"
+              type="submit"
+              form="formAgregarCategoria"
+              class="btn btn-primary"
               id="btnGuardarCategoria"
             >
               Guardar
@@ -190,35 +182,41 @@
       aria-hidden="true"
     >
       <div class="modal-dialog">
-        <div class="modal-content bg-dark text-white border-secondary">
-          <div class="modal-header border-secondary">
+        <div class="modal-content">
+          <div class="modal-header bg-warning">
             <h5 class="modal-title">Editar categoría</h5>
             <button
               type="button"
-              class="btn-close btn-close-white"
+              class="btn-close"
               data-bs-dismiss="modal"
             ></button>
           </div>
           <div class="modal-body">
-            <div class="mb-3">
-              <label class="form-label">Nombre</label>
-              <input
-                type="text"
-                class="form-control bg-dark text-white border-secondary"
-                id="editCategoriaNombre"
-              />
-            </div>
-            <div class="mb-3">
-              <label class="form-label">Límite mensual</label>
-              <input
-                type="number"
-                class="form-control bg-dark text-white border-secondary"
-                id="editCategoriaMonto"
-                step="0.01"
-              />
-            </div>
+            <form id="formEditarCategoria">
+              <div class="mb-3">
+                <label class="form-label">Nombre</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="editCategoriaNombre"
+                  name="nombre"
+                  required
+                />
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Límite mensual</label>
+                <input
+                  type="number"
+                  class="form-control"
+                  id="editCategoriaMonto"
+                  name="monto_maximo"
+                  step="0.01"
+                  required
+                />
+              </div>
+            </form>
           </div>
-          <div class="modal-footer border-secondary">
+          <div class="modal-footer">
             <button
               type="button"
               class="btn btn-outline-secondary"
@@ -227,7 +225,8 @@
               Cancelar
             </button>
             <button
-              type="button"
+              type="submit"
+              form="formEditarCategoria"
               class="btn btn-warning"
               id="btnActualizarCategoria"
             >
@@ -246,8 +245,8 @@
       aria-hidden="true"
     >
       <div class="modal-dialog modal-sm">
-        <div class="modal-content bg-dark text-white border-secondary">
-          <div class="modal-header border-secondary">
+        <div class="modal-content">
+          <div class="modal-header bg-danger text-white">
             <h5 class="modal-title">Eliminar categoría</h5>
             <button
               type="button"
@@ -257,11 +256,10 @@
           </div>
           <div class="modal-body">
             <p>
-              ¿Estás seguro de que quieres eliminar esta categoría? Se
-              eliminarán también todos sus gastos asociados.
+              ¿Estás seguro? Se eliminarán también todos los gastos asociados.
             </p>
           </div>
-          <div class="modal-footer border-secondary">
+          <div class="modal-footer">
             <button
               type="button"
               class="btn btn-outline-secondary"
@@ -286,5 +284,6 @@
       integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
       crossorigin="anonymous"
     ></script>
+    <script src="js/categorias.js" defer></script>
   </body>
 </html>

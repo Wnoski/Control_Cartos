@@ -39,9 +39,9 @@ def obtener_dashboard_mes_anterior(user_id):
             sql = """
                 SELECT 
                     c.id,
-                    c.categoria,
+                    c.nombre,
                     c.monto_maximo,
-                    COALESCE(SUM(g.gasto), 0) as total_gastado
+                    COALESCE(SUM(g.monto_gasto), 0) as total_gastado
                 FROM categorias c
                 LEFT JOIN gastos g ON c.id = g.id_categoria 
                     AND MONTH(g.fecha) = MONTH(DATE_SUB(CURRENT_DATE(), INTERVAL 1 MONTH))
@@ -70,7 +70,7 @@ def obtener_historico_3_meses(user_id):
                     MONTH(g.fecha) as mes,
                     YEAR(g.fecha) as año,
                     c.nombre,
-                    COALESCE(SUM(g.gasto), 0) as total_gastado
+                    COALESCE(SUM(g.monto_gasto), 0) as total_gastado
                 FROM gastos g
                 JOIN categorias c ON g.id_categoria = c.id
                 WHERE g.id_usuario = %s
