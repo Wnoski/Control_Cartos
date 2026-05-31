@@ -21,7 +21,7 @@ def buscar_usuario_por_email(email):
         conexion.close()
 
 
-def crear_usuario(nombre_usuario, email, password, presupuesto, token_verificacion):
+def crear_usuario(nombre_usuario, email, password, presupuesto, token_verificacion, foto_perfil):
     conexion = create_connection()
     
     if not conexion:
@@ -31,9 +31,9 @@ def crear_usuario(nombre_usuario, email, password, presupuesto, token_verificaci
     
         with conexion.cursor() as cursor:
             sql = """INSERT INTO usuarios 
-                     (nombre_usuario, email, password, presupuesto_maximo_mensual, token_verificacion) 
-                     VALUES (%s, %s, %s, %s, %s)"""
-            cursor.execute(sql, (nombre_usuario, email, password, presupuesto, token_verificacion))
+                     (nombre_usuario, email, password, presupuesto_maximo_mensual, token_verificacion, foto_perfil) 
+                     VALUES (%s, %s, %s, %s, %s, %s)"""
+            cursor.execute(sql, (nombre_usuario, email, password, presupuesto, token_verificacion, foto_perfil))
             conexion.commit()
             return cursor.lastrowid
     except Exception as e:

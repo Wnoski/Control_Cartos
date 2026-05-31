@@ -98,7 +98,11 @@ async function agregarGasto(form) {
 // ==========================================
 async function comprobarToken() {
   token = localStorage.getItem("token");
-  if (!token) window.location.href = "index.html";
+  //SE DEBE REVISAR NO SOLO SI HAY TOKEN SI NO SI ESTA VENCIDO
+  if (!token) {
+    window.location.href = "index.html";
+    return;
+  }
 
   await obtenerPerfil(token);
   await obtenerDatosDashboard(token);

@@ -14,7 +14,7 @@ conf = ConnectionConfig(
 
 async def enviar_mail_verificacion(email, token):
     try:
-        url = f"http://127.0.0.1:5500/fronted/verificado.html?token={token}"
+        url = f"http://127.0.0.1:5500/frontend/verificado.html?token={token}"
         mensaje = MessageSchema(
             subject="Verificacion de cuenta",
             recipients=[email],

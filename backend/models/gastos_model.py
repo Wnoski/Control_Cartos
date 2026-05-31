@@ -49,12 +49,14 @@ def obtener_gastos(user_id, nombre_categoria=None):
             if nombre_categoria:
                 sql = """SELECT g.id, g.monto_gasto, g.descripcion, g.fecha, c.nombre 
                          FROM gastos g JOIN categorias c ON g.id_categoria = c.id
-                         WHERE g.id_usuario = %s AND c.categoria = %s"""
+                         WHERE g.id_usuario = %s AND c.categoria = %s
+                         ORDER BY g.fecha DESC"""
                 cursor.execute(sql, (user_id, nombre_categoria))
             else:
                 sql = """SELECT g.id, g.monto_gasto, g.descripcion, g.fecha, c.nombre 
                          FROM gastos g JOIN categorias c ON g.id_categoria = c.id
-                         WHERE g.id_usuario = %s GROUP BY g.id_categoria"""
+                         WHERE g.id_usuario = %s
+                         ORDER BY g.fecha DESC"""
                 cursor.execute(sql, (user_id,))
             return cursor.fetchall()
     except Exception as e:

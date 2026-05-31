@@ -6,7 +6,7 @@ def obtener_categorias(user_id):
         conexion = create_connection()
     
         with conexion.cursor() as cursor:
-            sql = "SELECT nombre, monto_maximo from categorias WHERE id_usuario = %s"
+            sql = "SELECT id, nombre, monto_maximo from categorias WHERE id_usuario = %s"
             cursor.execute(sql, (user_id,)) 
             
             return cursor.fetchall()
