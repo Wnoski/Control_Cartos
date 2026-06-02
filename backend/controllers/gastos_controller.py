@@ -37,3 +37,14 @@ def eliminar_gasto_de_usuario(gasto_id, user_id):
     except Exception as e:
         print(f"Error al eliminar gasto: {e}")
         raise HTTPException(status_code=500, detail="Error interno del servidor")
+
+
+def editar_gasto(user_id, gasto_id, datos):
+    try:
+        gastos_model.editar_gasto(user_id, gasto_id, datos)
+        return {"status": "success", "mensaje": "Gasto editado correctamente"}
+    except Exception as e:
+        print(f"Error al editar gasto: {e}")
+        raise HTTPException(status_code=500, detail="Error interno del servidor")
+    
+

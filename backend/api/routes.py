@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, UploadFile, File
 from controllers import auth_controller, categoria_controller, gastos_controller, perfil_controller, dashboard_controller
-from models.schemas import LoginRequest, RegisterRequest, CambioRequest, CategoriaRequest, GastosRequest, NicknameRequest, PasswordRequest, PresupuestoRequest, EmailRequest
+from models.schemas import LoginRequest, RegisterRequest, CambioRequest, CategoriaRequest, GastosRequest, NicknameRequest, PasswordRequest, PresupuestoRequest, GastosEditRequest, EmailRequest
 from utils.auth import verificar_token
 
 router_usuario = APIRouter()
@@ -63,6 +63,12 @@ def obtener_gastos(user_id: int = Depends(verificar_token), nombre_categoria: st
 @router_gastos.post("/")
 def crear_gasto(datos: GastosRequest, user_id: int = Depends(verificar_token)):
     return gastos_controller.crear_gasto(datos.nombre_categoria, user_id, datos.monto, datos.descripcion)
+
+@router_gastos.put("/{gasto_id}")
+def editar_gasto(datos: GastosEditRequest, gasto_id: int, user_id: int = Depends(verificar_token)):
+    print("llega")
+    print(datos)
+    return gastos_controller.editar_gasto(user_id, gasto_id, datos.model_dump())
 
 @router_gastos.delete("/{gasto_id}")
 def eliminar_gasto(gasto_id: int, user_id: int = Depends(verificar_token)):

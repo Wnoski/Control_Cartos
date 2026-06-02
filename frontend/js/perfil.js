@@ -35,7 +35,10 @@ document.addEventListener("DOMContentLoaded", comprobarToken);
 // ==========================================
 async function comprobarToken() {
   token = localStorage.getItem("token");
-  if (!token) {
+  const payload = JSON.parse(atob(token.split(".")[1]));
+  const expirado = payload.exp * 1000 < Date.now();
+
+  if (!token || expirado) {
     window.location.href = "index.html";
     return;
   }

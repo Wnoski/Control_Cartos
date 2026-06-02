@@ -17,6 +17,10 @@
       href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
       rel="stylesheet"
     />
+    <link
+      rel="stylesheet"
+      href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css"
+    />
     <link rel="stylesheet" href="style.css" />
     <link
       rel="shortcut icon"
@@ -85,7 +89,7 @@
 
     <!-- MAIN -->
     <main class="container mt-5 pt-4">
-      <div class="d-flex justify-content-between align-items-center mb-4">
+      <div class="d-flex justify-content-between align-items-center mb-4 mt-3">
         <h4 class="mb-0">Mis categorías</h4>
         <button class="btn btn-primary btn-sm" id="btnAbrirAgregarCategoria">
           <i class="bi bi-plus-circle me-1"></i>Agregar categoría
@@ -94,16 +98,16 @@
 
       <!-- TABLA CATEGORIAS -->
       <div class="card shadow-sm border-0">
-        <div class="card-body p-0">
-          <table class="table table-hover mb-0">
+        <div class="card-body">
+          <table class="table table-hover mb-0" id="tablaCategorias">
             <thead class="table-light">
               <tr>
                 <th>Categoría</th>
                 <th>Límite mensual</th>
-                <th class="text-end">Acciones</th>
+                <th class="text-center">Acciones</th>
               </tr>
             </thead>
-            <tbody id="tablaCategorias">
+            <tbody id="tablaCategoriasBody">
               <!-- Se rellena con JS -->
             </tbody>
           </table>
@@ -279,11 +283,14 @@
       </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
     <script
       src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
       integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
       crossorigin="anonymous"
     ></script>
+    <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js"></script>
     <script src="js/categorias.js" defer></script>
   </body>
 </html>

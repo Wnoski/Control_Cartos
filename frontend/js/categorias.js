@@ -19,6 +19,7 @@ const modalEliminarCategoria = bootstrap.Modal.getOrCreateInstance(
 const URL_BASE = "http://127.0.0.1:8000";
 let categoriaIdSeleccionada = null;
 let token;
+let dataTable = null;
 // ==========================================
 // 1. INICIALIZACIÓN
 // ==========================================
@@ -104,7 +105,12 @@ async function eliminarCategoria(id) {
 // 3. RENDERIZADO
 // ==========================================
 function renderCategorias(categorias) {
-  const tbody = document.getElementById("tablaCategorias");
+  if (dataTable) {
+    dataTable.destroy();
+    dataTable = null;
+  }
+
+  const tbody = document.getElementById("tablaCategoriasBody");
   const thead = document.querySelector("thead");
 
   if (!categorias || categorias.length === 0) {
@@ -126,14 +132,14 @@ function renderCategorias(categorias) {
     <tr>
       <td>${cat.nombre}</td>
       <td>${cat.monto_maximo} €</td>
-      <td class="text-end">
-        <button class="btn btn-outline-warning btn-sm me-1 btn-editar" 
-          data-id="${cat.id}" 
-          data-nombre="${cat.nombre}" 
+      <td class="text-center">
+        <button class="btn btn-outline-warning btn-sm me-1 btn-editar"
+          data-id="${cat.id}"
+          data-nombre="${cat.nombre}"
           data-monto="${cat.monto_maximo}">
           <i class="bi bi-pencil"></i>
         </button>
-        <button class="btn btn-outline-danger btn-sm btn-eliminar" 
+        <button class="btn btn-outline-danger btn-sm btn-eliminar"
           data-id="${cat.id}">
           <i class="bi bi-trash"></i>
         </button>
@@ -141,14 +147,21 @@ function renderCategorias(categorias) {
     </tr>`,
     )
     .join("");
-}
 
-// ==========================================
-// 4. EVENT LISTENERS
-// ==========================================
-// ==========================================
-// 4. REFERENCIAS AL DOM
-// ==========================================
+  dataTable = new DataTable("#tablaCategorias", {
+    language: {
+      search: "Buscar:",
+      lengthMenu: "Mostrar _MENU_ registros",
+      info: "Mostrando _START_ a _END_ de _TOTAL_ categorías",
+      infoEmpty: "No hay categorías registradas",
+      infoFiltered: "(filtrado de _MAX_ categorías en total)",
+      zeroRecords: "No se encontraron categorías con ese criterio",
+      emptyTable: "No hay categorías registradas",
+      paginate: { next: "Siguiente", previous: "Anterior" },
+    },
+    columnDefs: [{ orderable: false, targets: 2 }],
+  });
+}
 
 // ==========================================
 // 5. EVENT LISTENERS

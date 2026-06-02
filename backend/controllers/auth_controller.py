@@ -45,6 +45,7 @@ def verificar_duplicado(email):
 async def crear_usuario(datos):
    
     try:
+        
         await auth_service.crear_usuario(datos)
         return {"status": "success", "mensaje": "Usuario creado, revisa tu email"}
     

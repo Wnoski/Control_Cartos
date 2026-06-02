@@ -83,3 +83,26 @@ def eliminar_gasto(gasto_id, user_id):
         raise Exception("Error de base de datos")
     finally:
         conexion.close()
+        
+
+def editar_gasto(user_id, gasto_id, datos):
+    conexion = create_connection()
+    
+    try:
+        with conexion.cursor() as cursor:
+            keys = [key for key, value in datos.items() if value is not None]
+            values = [value for value in datos.values() if value is not None]
+            campos = ", ".join([f"{key} = %s" for key in keys])
+            values.append(gasto_id)
+            values.append(user_id)
+            sql = f"UPDATE gastos SET {campos} WHERE id = %s AND id_usuario = %s"
+            cursor.execute(sql, values)
+            conexion.commit()
+            return cursor.rowcount > 0
+    except Exception as e:
+        conexion.rollback()
+        print(f"Error al eliminar gasto: {e}")
+        raise Exception("Error de base de datos")
+    finally:
+        if conexion:
+            conexion.close()

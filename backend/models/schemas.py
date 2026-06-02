@@ -24,8 +24,13 @@ class CategoriaRequest(BaseModel):
     monto_maximo: float
     
 class GastosRequest(BaseModel):
-    nombre_categoria: str
+    nombre_categoria: str 
     monto: float
+    descripcion: str | None = None
+
+class GastosEditRequest(BaseModel):
+    nombre_categoria: str | None = None
+    monto: float | None = None
     descripcion: str | None = None
     
 class NicknameRequest(BaseModel):

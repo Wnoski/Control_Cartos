@@ -115,6 +115,29 @@ async function eliminarGasto(id) {
   }
 }
 
+async function editarGasto(id, datos) {
+  console.log(datos);
+  try {
+    const res = await fetch(`${URL_BASE}/gastos/${id}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+
+      body: JSON.stringify(
+        datos.nombre_categoria,
+        datos.monto,
+        datos.descripcion,
+      ),
+    });
+    return res.ok;
+  } catch (error) {
+    console.warn("Error al editar gasto:", error);
+    return false;
+  }
+}
+
 // ==========================================
 // 4. RENDERIZADO
 // ==========================================
@@ -144,11 +167,7 @@ function renderGastos(gastos) {
     return;
   }
 
-  const gastosOrdenados = gastos.sort(
-    (a, b) => new Date(b.fecha) - new Date(a.fecha),
-  );
-
-  bodyTablaGastos.innerHTML = gastosOrdenados
+  bodyTablaGastos.innerHTML = gastos
     .map(
       (g) => `
     <tr>
@@ -156,7 +175,14 @@ function renderGastos(gastos) {
       <td>${g.descripcion || "-"}</td>
       <td>${g.nombre}</td>
       <td>${g.monto_gasto} €</td>
-      <td class="text-end">
+      <td class="text-center">
+        <button class="btn btn-outline-warning btn-sm me-1 btn-editar-gasto"
+          data-id="${g.id}"
+          data-monto="${g.monto_gasto}"
+          data-descripcion="${g.descripcion || ""}"
+          data-categoria="${g.nombre}">
+          <i class="bi bi-pencil"></i>
+        </button> 
         <button class="btn btn-outline-danger btn-sm btn-eliminar-gasto" data-id="${g.id}">
           <i class="bi bi-trash"></i>
         </button>
@@ -166,7 +192,6 @@ function renderGastos(gastos) {
     .join("");
 
   dataTable = new DataTable("#tablaGastos", {
-    order: [[0, "desc"]],
     language: {
       search: "Buscar:",
       lengthMenu: "Mostrar _MENU_ registros",
@@ -177,6 +202,7 @@ function renderGastos(gastos) {
       emptyTable: "No hay gastos registrados",
       paginate: { next: "Siguiente", previous: "Anterior" },
     },
+    columnDefs: [{ orderable: false, targets: -1 }],
   });
 }
 
@@ -200,6 +226,46 @@ formAgregarGasto.addEventListener("submit", async (e) => {
   if (ok) {
     modalAgregarGasto.hide();
     e.target.reset();
+    const gastos = await obtenerGastos();
+    renderGastos(gastos);
+  }
+});
+
+bodyTablaGastos.addEventListener("click", async (e) => {
+  const btnEliminar = e.target.closest(".btn-eliminar-gasto");
+  const btnEditar = e.target.closest(".btn-editar-gasto");
+
+  if (btnEliminar) {
+    gastoIdSeleccionado = btnEliminar.dataset.id;
+    modalEliminarGasto.show();
+  }
+
+  if (btnEditar) {
+    gastoIdSeleccionado = btnEditar.dataset.id;
+    editGastoMonto.value = btnEditar.dataset.monto;
+    editGastoDescripcion.value = btnEditar.dataset.descripcion || "";
+    const categorias = await obtenerCategorias();
+    cargarCategoriasEnSelect(editGastoCategoria, categorias);
+    editGastoCategoria.value = btnEditar.dataset.categoria;
+    modalEditarGasto.show();
+  }
+});
+
+formEditarGasto.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const formData = new FormData(e.target);
+  const datos = Object.fromEntries(
+    [...formData.entries()].filter(([_, v]) => v !== ""),
+  );
+
+  if (Object.keys(datos).length === 0) {
+    alert("No has modificado ningún campo");
+    return;
+  }
+
+  const ok = await editarGasto(gastoIdSeleccionado, datos);
+  if (ok) {
+    modalEditarGasto.hide();
     const gastos = await obtenerGastos();
     renderGastos(gastos);
   }
