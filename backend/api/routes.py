@@ -7,29 +7,42 @@ router_usuario = APIRouter()
 
 
 #USER
-@router_usuario.post("/login")
-def usuario_login(datos: LoginRequest):
-    return auth_controller.usuario_login(datos.email, datos.password)
+
     
 @router_usuario.post("/register")
 async def usuario_regis(datos: RegisterRequest):
     return await auth_controller.crear_usuario(datos)
 
-@router_usuario.get("/verificar/{token}")
-def verificar_cuenta(token: str):
-    return auth_controller.verificar_cuenta(token)
+@router_usuario.post("/register/duplicado")
+def usuario_regis(datos: EmailRequest):
+    return auth_controller.verificar_duplicado(datos.email)
 
 @router_usuario.post("/olvidar")
 async def solicitar_cambio_contraseña(datos: EmailRequest):
     return await auth_controller.solicitar_cambio(datos.email)
 
+@router_usuario.get("/tiempo-token")
+def verificar_tiempo_token(user_id: int = Depends(verificar_token)):
+    return {
+            "status": "success",
+            "user_id": user_id
+            }
+
+@router_usuario.post("/login/{recordar}")
+def usuario_login(datos: LoginRequest, recordar: str):
+    return auth_controller.usuario_login(datos.email, datos.password, recordar)
+
+@router_usuario.get("/verificar/{token}")
+def verificar_cuenta(token: str):
+    return auth_controller.verificar_cuenta(token)
+
 @router_usuario.post("/cambiar/{token}")
 async def solicitar_cambio_contraseña(datos: CambioRequest, token: str):
     return auth_controller.cambiar_contraseña(token, datos.new_password, datos.confirm_password)
 
-@router_usuario.post("/register/duplicado")
-def usuario_regis(datos: EmailRequest):
-    return auth_controller.verificar_duplicado(datos.email)
+
+
+
 
 #CATEGORIAS
 
@@ -66,8 +79,7 @@ def crear_gasto(datos: GastosRequest, user_id: int = Depends(verificar_token)):
 
 @router_gastos.put("/{gasto_id}")
 def editar_gasto(datos: GastosEditRequest, gasto_id: int, user_id: int = Depends(verificar_token)):
-    print("llega")
-    print(datos)
+    
     return gastos_controller.editar_gasto(user_id, gasto_id, datos.model_dump())
 
 @router_gastos.delete("/{gasto_id}")
@@ -82,6 +94,11 @@ router_perfil = APIRouter()
 @router_perfil.get("/")
 def obtener_perfil(user_id: int = Depends(verificar_token)):
     return perfil_controller.obtener_perfil(user_id)
+
+@router_perfil.delete("/")
+def eliminar_cuenta(user_id: int = Depends(verificar_token)):
+    return perfil_controller.eliminar_cuenta(user_id)
+
 
 @router_perfil.put("/nickname")
 def cambiar_nickname(datos: NicknameRequest, user_id: int = Depends(verificar_token)):
@@ -98,10 +115,6 @@ def cambiar_presupuesto(datos: PresupuestoRequest, user_id: int = Depends(verifi
 @router_perfil.put("/foto")
 async def cambiar_foto(user_id: int = Depends(verificar_token), foto: UploadFile = File(...)):
     return await perfil_controller.cambiar_foto(user_id, foto)
-
-@router_perfil.delete("/")
-def eliminar_cuenta(user_id: int = Depends(verificar_token)):
-    return perfil_controller.eliminar_cuenta(user_id)
 
 
 #DASHBOARD

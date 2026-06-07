@@ -4,9 +4,9 @@ from fastapi import HTTPException
 from models import usuarios_model
 
 
-def usuario_login(email, password):
+def usuario_login(email, password, recordar):
     try:
-        usuario = auth_service.usuario_login(email, password)
+        usuario = auth_service.usuario_login(email, password, recordar)
         
         return {
             "status": "success",
@@ -19,8 +19,9 @@ def usuario_login(email, password):
         }
     
     except CredencialesError as e:
+        print(e)
         raise HTTPException(status_code=401, detail=str(e))
-    
+
     except CuentaNoVerificadaError as e:
         raise HTTPException(status_code=403, detail= str(e))
     

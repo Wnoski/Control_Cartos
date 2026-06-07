@@ -97,15 +97,54 @@ async function agregarGasto(form) {
 // 3. LÓGICA CENTRAL Y PETICIONES API
 // ==========================================
 async function comprobarToken() {
-  token = localStorage.getItem("token");
-  //SE DEBE REVISAR NO SOLO SI HAY TOKEN SI NO SI ESTA VENCIDO
-  if (!token) {
+  const cookieToken = obtenerCookie("token");
+  const localToken = localStorage.getItem("token");
+  const tokenAUsar = cookieToken || localToken;
+
+  if (!tokenAUsar) {
     window.location.href = "index.html";
     return;
   }
 
+  const valido = await verificarTiempoToken(tokenAUsar);
+  if (!valido) {
+    document.cookie = "token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+    localStorage.removeItem("token");
+    window.location.href = "index.html";
+    return;
+  }
+
+  localStorage.setItem("token", tokenAUsar);
+  token = tokenAUsar;
+
   await obtenerPerfil(token);
   await obtenerDatosDashboard(token);
+}
+
+function obtenerCookie(nombre) {
+  const cookies = document.cookie.split(";");
+  const cookie = cookies.find((c) => c.trim().startsWith(nombre));
+  return cookie ? cookie.split("=")[1] : null;
+}
+
+async function verificarTiempoToken(token) {
+  try {
+    const res = await fetch(`${URL_BASE}/usuarios/tiempo-token`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
+    if (!res.ok) {
+      const obj_res = await res.json();
+      localStorage.removeItem("token");
+      window.location.href = "index.html";
+      return false;
+    }
+
+    return true;
+  } catch (error) {
+    console.warn("Error de red:", error);
+    return false;
+  }
 }
 
 async function obtenerPerfil(token) {
@@ -325,4 +364,5 @@ ulFoto.addEventListener("click", (e) => {
   if (!btnCerrar) return;
 
   localStorage.clear();
+  document.cookie = "token =; expires = Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
 });

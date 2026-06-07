@@ -10,7 +10,7 @@ from datetime import datetime, timedelta, timezone
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
-def usuario_login(email, password):
+def usuario_login(email, password, recordar):
     try:
         usuario = usuarios_model.buscar_usuario_por_email(email)
         
@@ -20,7 +20,7 @@ def usuario_login(email, password):
         if not usuario["verificado"]:
             raise CuentaNoVerificadaError("Cuentan no verificada")
         
-        token = crear_token({"id": usuario["id"]})
+        token = crear_token({"id": usuario["id"]}, 7 if recordar == "true" else 1)
         
         if not token:
             raise Exception("Error interno")
@@ -90,10 +90,10 @@ def verificar_usuario(token):
     except Exception as e:
         print(f"Error en service registro: {e}")
         raise Exception("Error interno")
-
-def crear_token(data:dict):
+ 
+def crear_token(data: dict,  tiempo: int = 1):
     datos = data.copy()
-    expiracion = datetime.now(timezone.utc) + timedelta(hours=24)
+    expiracion = datetime.now(timezone.utc) + timedelta(days= tiempo)
     datos.update({"exp": expiracion})
     token = jwt.encode(datos, os.getenv("SECRET_KEY"), algorithm="HS256")
     return token
