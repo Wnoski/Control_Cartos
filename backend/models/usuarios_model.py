@@ -4,9 +4,6 @@ from config.database import create_connection
 def buscar_usuario_por_email(email):
     
     conexion = create_connection()
-     
-    if not conexion:
-        return None
     
     try:
         with conexion.cursor() as cursor:
@@ -15,17 +12,15 @@ def buscar_usuario_por_email(email):
             usuario = cursor.fetchone()
             return usuario
     except Exception as e:
-        print(f"Error al ejecutar la consulta: {e}")
+        print(f"Error al buscar usuario: {e}")
         raise Exception("Error de base de datos")
     finally:
-        conexion.close()
+        if conexion:
+            conexion.close()
 
 
 def crear_usuario(nombre_usuario, email, password, presupuesto, token_verificacion, foto_perfil):
     conexion = create_connection()
-    
-    if not conexion:
-        return None
     
     try:
     
@@ -41,13 +36,12 @@ def crear_usuario(nombre_usuario, email, password, presupuesto, token_verificaci
         print(f"Error al crear usuario: {e}")
         raise Exception("Error al crear usuario")
     finally:
-        conexion.close()
+        if conexion:
+            conexion.close()
         
 def verificar_usuario(token):
     conexion = create_connection()
      
-    if not conexion:
-        return None
     try:
         with conexion.cursor() as cursor:
             sql = "UPDATE usuarios SET verificado = 1 WHERE token_verificacion = %s" 
@@ -60,14 +54,12 @@ def verificar_usuario(token):
         print(f"Error al ejecutar la consulta: {e}")
         raise Exception("Error de base de datos")
     finally:
-        conexion.close()
+        if conexion:
+            conexion.close()
         
         
 def cambiar_contraseña(new_password, user_id):
     conexion = create_connection()
-    
-    if not conexion:
-        return None
     
     try:
         
@@ -82,5 +74,6 @@ def cambiar_contraseña(new_password, user_id):
         print(f"Error al cambiar contraseña {e}")
         raise Exception("Error de base de datos")
     finally:
-        conexion.close()
+        if conexion:
+            conexion.close()
     

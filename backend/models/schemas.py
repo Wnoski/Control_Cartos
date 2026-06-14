@@ -25,12 +25,12 @@ class CategoriaRequest(BaseModel):
     
 class GastosRequest(BaseModel):
     nombre_categoria: str 
-    monto: float
+    monto_gasto: float
     descripcion: str | None = None
 
 class GastosEditRequest(BaseModel):
     nombre_categoria: str | None = None
-    monto: float | None = None
+    monto_gasto: float | None = None
     descripcion: str | None = None
     
 class NicknameRequest(BaseModel):

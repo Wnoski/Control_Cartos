@@ -2,8 +2,7 @@ from config.database import create_connection
 
 def obtener_dashboard_mes_actual(user_id):
     conexion = create_connection()
-
-    
+ 
     try:
         with conexion.cursor() as cursor:
             sql = """
@@ -30,10 +29,7 @@ def obtener_dashboard_mes_actual(user_id):
 
 def obtener_dashboard_mes_anterior(user_id):
     conexion = create_connection()
-    
-    if not conexion:
-        return None
-    
+
     try:
         with conexion.cursor() as cursor:
             sql = """
@@ -55,13 +51,11 @@ def obtener_dashboard_mes_anterior(user_id):
         print(f"Error al obtener dashboard mes anterior: {e}")
         raise Exception("Error de base de datos")
     finally:
-        conexion.close()
+        if conexion:
+            conexion.close()
 
 def obtener_historico_3_meses(user_id):
     conexion = create_connection()
-    
-    if not conexion:
-        return None
     
     try:
         with conexion.cursor() as cursor:
@@ -84,13 +78,11 @@ def obtener_historico_3_meses(user_id):
         print(f"Error al obtener historico: {e}")
         raise Exception("Error de base de datos")
     finally:
-        conexion.close()
+        if conexion:
+            conexion.close()
 
 def obtener_presupuesto_usuario(user_id):
     conexion = create_connection()
-    
-    if not conexion:
-        return None
     
     try:
         with conexion.cursor() as cursor:
@@ -101,4 +93,5 @@ def obtener_presupuesto_usuario(user_id):
         print(f"Error al obtener presupuesto: {e}")
         raise Exception("Error de base de datos")
     finally:
-        conexion.close()
+        if conexion:
+            conexion.close()

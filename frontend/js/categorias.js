@@ -16,28 +16,27 @@ const modalEditarCategoria = bootstrap.Modal.getOrCreateInstance(
 const modalEliminarCategoria = bootstrap.Modal.getOrCreateInstance(
   document.getElementById("modalEliminarCategoria"),
 );
-const URL_BASE = "http://127.0.0.1:8000";
+
 let categoriaIdSeleccionada = null;
-let token;
 let dataTable = null;
 // ==========================================
 // 1. INICIALIZACIÓN
 // ==========================================
-document.addEventListener("DOMContentLoaded", comprobarToken);
+document.addEventListener("DOMContentLoaded", async () => {
+  token = await comprobarToken();
+
+  const [categorias, perfil] = await Promise.all([
+    obtenerCategorias(),
+    obtenerDatosPerfil(token),
+  ]);
+
+  renderPerfil(perfil);
+  renderCategorias(categorias);
+});
 
 // ==========================================
 // 2. LÓGICA CENTRAL Y PETICIONES API
 // ==========================================
-async function comprobarToken() {
-  token = localStorage.getItem("token");
-  if (!token) {
-    window.location.href = "index.html";
-    return;
-  }
-  const categorias = await obtenerCategorias();
-  renderCategorias(categorias);
-}
-
 async function obtenerCategorias() {
   try {
     const res = await fetch(`${URL_BASE}/categorias/`, {
@@ -49,7 +48,7 @@ async function obtenerCategorias() {
     }
     return null;
   } catch (error) {
-    console.warn("Error al obtener categorias:", error);
+    console.error("Error al obtener categorias:", error);
     return null;
   }
 }
@@ -66,7 +65,7 @@ async function agregarCategoria(datos) {
     });
     return res.ok;
   } catch (error) {
-    console.warn("Error al agregar categoria:", error);
+    console.error("Error al agregar categoria:", error);
     return false;
   }
 }
@@ -83,7 +82,7 @@ async function editarCategoria(id, datos) {
     });
     return res.ok;
   } catch (error) {
-    console.warn("Error al editar categoria:", error);
+    console.error("Error al editar categoria:", error);
     return false;
   }
 }
@@ -96,7 +95,7 @@ async function eliminarCategoria(id) {
     });
     return res.ok;
   } catch (error) {
-    console.warn("Error al eliminar categoria:", error);
+    console.error("Error al eliminar categoria:", error);
     return false;
   }
 }
@@ -202,19 +201,31 @@ tablaCategorias.addEventListener("click", (e) => {
 formEditarCategoria.addEventListener("submit", async (e) => {
   e.preventDefault();
   const datos = Object.fromEntries(new FormData(e.target));
-  const ok = await editarCategoria(categoriaIdSeleccionada, datos);
-  if (ok) {
+  const editada = await editarCategoria(categoriaIdSeleccionada, datos);
+  if (editada) {
+    notificar("Categoría editada correctamente.", "success");
     modalEditarCategoria.hide();
     const categorias = await obtenerCategorias();
     renderCategorias(categorias);
+  } else {
+    notificar(
+      "Error al editar categoría. Por favor, intente nuevamente.",
+      "error",
+    );
   }
 });
 
 btnConfirmarEliminar.addEventListener("click", async () => {
-  const ok = await eliminarCategoria(categoriaIdSeleccionada);
-  if (ok) {
+  const eliminada = await eliminarCategoria(categoriaIdSeleccionada);
+  if (eliminada) {
+    notificar("Categoría eliminada correctamente.", "success");
     modalEliminarCategoria.hide();
     const categorias = await obtenerCategorias();
     renderCategorias(categorias);
+  } else {
+    notificar(
+      "Error al eliminar categoría. Por favor, intente nuevamente.",
+      "error",
+    );
   }
 });

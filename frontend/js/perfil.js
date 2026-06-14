@@ -1,11 +1,10 @@
 // ==========================================
 // 1. CONSTANTES Y REFERENCIAS AL DOM
 // ==========================================
-const URL_BASE = "http://127.0.0.1:8000";
+
 let token;
 
 const fotoPerfil = document.getElementById("fotoPerfil");
-const fotoDropdown = document.getElementById("fotoDropdown");
 const nombreUsuario = document.getElementById("nombreUsuario");
 const emailUsuario = document.getElementById("emailUsuario");
 const inputFoto = document.getElementById("inputFoto");
@@ -172,9 +171,9 @@ btnGuardarNickname.addEventListener("click", async () => {
   if (ok) {
     nombreUsuario.textContent = nick;
     nuevoNickname.value = "";
-    alert("Nickname actualizado correctamente");
+    notificar("Nickname actualizado correctamente", "success");
   } else {
-    alert("Error al cambiar el nickname");
+    notificar("Error al cambiar el nickname", "error");
   }
 });
 
@@ -184,11 +183,11 @@ btnGuardarPassword.addEventListener("click", async () => {
   const confirmar = passwordConfirmar.value.trim();
 
   if (!actual || !nueva || !confirmar) {
-    alert("Por favor completa todos los campos");
+    notificar("Por favor completa todos los campos", "error");
     return;
   }
   if (nueva !== confirmar) {
-    alert("Las contraseñas no coinciden");
+    notificar("Las contraseñas no coinciden", "error");
     return;
   }
   const ok = await cambiarPassword(actual, nueva, confirmar);
@@ -196,9 +195,9 @@ btnGuardarPassword.addEventListener("click", async () => {
     passwordActual.value = "";
     passwordNueva.value = "";
     passwordConfirmar.value = "";
-    alert("Contraseña actualizada correctamente");
+    notificar("Contraseña actualizada correctamente", "success");
   } else {
-    alert("Error al cambiar la contraseña");
+    notificar("Error al cambiar la contraseña", "error");
   }
 });
 
@@ -207,9 +206,9 @@ btnGuardarPresupuesto.addEventListener("click", async () => {
   if (!presupuesto) return;
   const ok = await cambiarPresupuesto(presupuesto);
   if (ok) {
-    alert("Presupuesto actualizado correctamente");
+    notificar("Presupuesto actualizado correctamente", "success");
   } else {
-    alert("Error al cambiar el presupuesto");
+    notificar("Error al cambiar el presupuesto", "error");
   }
 });
 
@@ -219,9 +218,9 @@ inputFoto.addEventListener("change", async (e) => {
   const data = await cambiarFoto(foto);
   if (data) {
     fotoPerfil.src = `${URL_BASE}/${data.url}`;
-    alert("Foto actualizada correctamente");
+    notificar("Foto actualizada correctamente", "success");
   } else {
-    alert("Error al cambiar la foto");
+    notificar("Error al cambiar la foto", "error");
   }
 });
 
@@ -231,6 +230,6 @@ btnConfirmarEliminarCuenta.addEventListener("click", async () => {
     localStorage.removeItem("token");
     window.location.href = "index.html";
   } else {
-    alert("Error al eliminar la cuenta");
+    notificar("Error al eliminar la cuenta", "error");
   }
 });

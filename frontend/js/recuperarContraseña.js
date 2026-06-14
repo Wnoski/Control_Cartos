@@ -3,34 +3,31 @@ const btnEnviar = document.getElementById("btnEnviar");
 
 btnEnviar.addEventListener("click", async () => {
   const email = inputEmail.value.trim();
-  console.log("click");
+
   if (!email) {
-    alert("Por favor, ingrese su correo electrónico.");
+    notificar("Por favor, ingrese su correo electrónico.", "error");
     return;
   }
 
   const enviado = await enviarCorreoRecuperacion(email);
 
   if (enviado) {
-    alert("enviado");
-    // new PNotify({
-    //   title: "Enviado",
-    //   text: "Correo enviado correctamente revisa tu bandeja de entrada y sigue los pasos",
-    //   type: "succes",
-    // });
+    inputEmail.value = "";
+    notificar(
+      "Correo enviado correctamente. Revisa tu bandeja de entrada y sigue los pasos.",
+      "success",
+    );
   } else {
-    alert("error");
-    // new PNotify({
-    //   title: "Error",
-    //   text: "Error al intentar enviar correo de recuperacion",
-    //   type: "error",
-    // });
+    notificar(
+      "Error al enviar correo de recuperación. Por favor, intente nuevamente.",
+      "error",
+    );
   }
 });
 
 async function enviarCorreoRecuperacion(email) {
   try {
-    const res = await fetch("http://127.0.0.1:8000/usuarios/olvidar", {
+    const res = await fetch(`${URL_BASE}/usuarios/olvidar`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

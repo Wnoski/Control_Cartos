@@ -1,13 +1,6 @@
 from fastapi import HTTPException
 from models import dashboard_model
 
-def calcular_mensaje(porcentaje):
-    if porcentaje >= 100:
-        return {"emoji": "🔴", "mensaje": "Límite superado"}
-    elif porcentaje >= 75:
-        return {"emoji": "🟡", "mensaje": "Cerca del límite"}
-    else:
-        return {"emoji": "🟢", "mensaje": "Vas bien"}
 
 def obtener_dashboard(user_id):
     try:
@@ -22,7 +15,7 @@ def obtener_dashboard(user_id):
             monto_maximo = float(categoria["monto_maximo"]) if categoria["monto_maximo"] else 0
             
             porcentaje = (total_gastado / monto_maximo * 100) if monto_maximo > 0 else 0
-            feedback = calcular_mensaje(porcentaje)
+            
             total_gastado_global += total_gastado
             
             resultado_categorias.append({
@@ -31,13 +24,12 @@ def obtener_dashboard(user_id):
                 "monto_maximo": monto_maximo,
                 "total_gastado": total_gastado,
                 "porcentaje": round(porcentaje, 1),
-                "emoji": feedback["emoji"],
-                "mensaje": feedback["mensaje"]
+            
             })
         
         presupuesto_maximo = float(presupuesto["presupuesto_maximo_mensual"]) if presupuesto else 0
         porcentaje_global = (total_gastado_global / presupuesto_maximo * 100) if presupuesto_maximo > 0 else 0
-        feedback_global = calcular_mensaje(porcentaje_global)
+        
         
         return {
             "status": "success",
@@ -45,8 +37,6 @@ def obtener_dashboard(user_id):
                 "presupuesto_maximo": presupuesto_maximo,
                 "total_gastado_global": round(total_gastado_global, 2),
                 "porcentaje_global": round(porcentaje_global, 1),
-                "emoji_global": feedback_global["emoji"],
-                "mensaje_global": feedback_global["mensaje"],
                 "categorias": resultado_categorias
             }
         }
@@ -66,7 +56,6 @@ def obtener_dashboard_mes_anterior(user_id):
             total_gastado = float(categoria["total_gastado"])
             monto_maximo = float(categoria["monto_maximo"]) if categoria["monto_maximo"] else 0
             porcentaje = (total_gastado / monto_maximo * 100) if monto_maximo > 0 else 0
-            feedback = calcular_mensaje(porcentaje)
             total_gastado_global += total_gastado
             
             resultado_categorias.append({
@@ -75,13 +64,11 @@ def obtener_dashboard_mes_anterior(user_id):
                 "monto_maximo": monto_maximo,
                 "total_gastado": total_gastado,
                 "porcentaje": round(porcentaje, 1),
-                "emoji": feedback["emoji"],
-                "mensaje": feedback["mensaje"]
             })
         
         presupuesto_maximo = float(presupuesto["presupuesto_maximo_mensual"]) if presupuesto else 0
         porcentaje_global = (total_gastado_global / presupuesto_maximo * 100) if presupuesto_maximo > 0 else 0
-        feedback_global = calcular_mensaje(porcentaje_global)
+        
         
         return {
             "status": "success",
@@ -89,8 +76,6 @@ def obtener_dashboard_mes_anterior(user_id):
                 "presupuesto_maximo": presupuesto_maximo,
                 "total_gastado_global": round(total_gastado_global, 2),
                 "porcentaje_global": round(porcentaje_global, 1),
-                "emoji_global": feedback_global["emoji"],
-                "mensaje_global": feedback_global["mensaje"],
                 "categorias": resultado_categorias
             }
         }

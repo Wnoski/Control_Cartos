@@ -1,7 +1,6 @@
 // ==========================================
 // 1. CONSTANTES Y REFERENCIAS AL DOM
 // ==========================================
-const URL_BASE = "http://127.0.0.1:8000";
 let token;
 let gastoIdSeleccionado = null;
 let dataTable = null;
@@ -19,7 +18,7 @@ const btnConfirmarEliminarGasto = document.getElementById(
 const editGastoMonto = document.getElementById("editGastoMonto");
 const editGastoCategoria = document.getElementById("editGastoCategoria");
 const editGastoDescripcion = document.getElementById("editGastoDescripcion");
-const gastoCategoria = document.getElementById("gastoCategoria");
+const selectCategoria = document.getElementById("gastoCategoria");
 
 const modalAgregarGasto = bootstrap.Modal.getOrCreateInstance(
   document.getElementById("modalAgregarGasto"),
@@ -34,25 +33,22 @@ const modalEliminarGasto = bootstrap.Modal.getOrCreateInstance(
 // ==========================================
 // 2. INICIALIZACIÓN
 // ==========================================
-document.addEventListener("DOMContentLoaded", comprobarToken);
+document.addEventListener("DOMContentLoaded", async () => {
+  token = await comprobarToken();
+
+  const [gastos, categorias, perfil] = await Promise.all([
+    obtenerGastos(),
+    obtenerCategorias(),
+    obtenerDatosPerfil(token),
+  ]);
+  cargarCategoriasEnSelect(selectCategoria, categorias);
+  renderPerfil(perfil);
+  renderGastos(gastos);
+});
 
 // ==========================================
 // 3. LÓGICA CENTRAL Y PETICIONES API
 // ==========================================
-async function comprobarToken() {
-  token = localStorage.getItem("token");
-  if (!token) {
-    window.location.href = "index.html";
-    return;
-  }
-  const [gastos, categorias] = await Promise.all([
-    obtenerGastos(),
-    obtenerCategorias(),
-  ]);
-  cargarCategoriasEnSelect(gastoCategoria, categorias);
-  renderGastos(gastos);
-}
-
 async function obtenerGastos() {
   try {
     const res = await fetch(`${URL_BASE}/gastos/`, {
@@ -64,7 +60,7 @@ async function obtenerGastos() {
     }
     return null;
   } catch (error) {
-    console.warn("Error al obtener gastos:", error);
+    console.error("Error al obtener gastos:", error);
     return null;
   }
 }
@@ -80,7 +76,7 @@ async function obtenerCategorias() {
     }
     return null;
   } catch (error) {
-    console.warn("Error al obtener categorias:", error);
+    console.error("Error al obtener categorias:", error);
     return null;
   }
 }
@@ -97,7 +93,7 @@ async function agregarGasto(datos) {
     });
     return res.ok;
   } catch (error) {
-    console.warn("Error al agregar gasto:", error);
+    console.error("Error al agregar gasto:", error);
     return false;
   }
 }
@@ -116,7 +112,6 @@ async function eliminarGasto(id) {
 }
 
 async function editarGasto(id, datos) {
-  console.log(datos);
   try {
     const res = await fetch(`${URL_BASE}/gastos/${id}`, {
       method: "PUT",
@@ -125,15 +120,16 @@ async function editarGasto(id, datos) {
         Authorization: `Bearer ${token}`,
       },
 
-      body: JSON.stringify(
-        datos.nombre_categoria,
-        datos.monto,
-        datos.descripcion,
-      ),
+      body: JSON.stringify(datos),
     });
-    return res.ok;
+    if (res.ok) {
+      return true;
+    }
+    notificar("Error al editar gasto", "error");
+    return false;
   } catch (error) {
-    console.warn("Error al editar gasto:", error);
+    console.error("Error al editar gasto:", error);
+
     return false;
   }
 }
@@ -211,7 +207,7 @@ function renderGastos(gastos) {
 // ==========================================
 btnAbrirAgregarGasto.addEventListener("click", async () => {
   const categorias = await obtenerCategorias();
-  cargarCategoriasEnSelect(gastoCategoria, categorias);
+  cargarCategoriasEnSelect(selectCategoria, categorias);
   modalAgregarGasto.show();
 });
 
@@ -253,18 +249,13 @@ bodyTablaGastos.addEventListener("click", async (e) => {
 
 formEditarGasto.addEventListener("submit", async (e) => {
   e.preventDefault();
+
   const formData = new FormData(e.target);
-  const datos = Object.fromEntries(
-    [...formData.entries()].filter(([_, v]) => v !== ""),
-  );
+  const datos = Object.fromEntries(formData);
 
-  if (Object.keys(datos).length === 0) {
-    alert("No has modificado ningún campo");
-    return;
-  }
-
-  const ok = await editarGasto(gastoIdSeleccionado, datos);
-  if (ok) {
+  const editado = await editarGasto(gastoIdSeleccionado, datos);
+  if (editado) {
+    notificar("Gasto actualizado correctamente", "success");
     modalEditarGasto.hide();
     const gastos = await obtenerGastos();
     renderGastos(gastos);

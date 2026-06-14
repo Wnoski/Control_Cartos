@@ -19,7 +19,6 @@ def usuario_login(email, password, recordar):
         }
     
     except CredencialesError as e:
-        print(e)
         raise HTTPException(status_code=401, detail=str(e))
 
     except CuentaNoVerificadaError as e:
@@ -35,7 +34,7 @@ def verificar_duplicado(email):
         existe = usuarios_model.buscar_usuario_por_email(email)
         
         if existe:
-            raise EmailDuplicado("Correo ya existe")
+            raise EmailDuplicado("Correo ya registrado")
         
         return {"status": "success", "mensaje": "Usuario creado, revisa tu email"}
     except EmailDuplicado as e:

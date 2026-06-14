@@ -28,15 +28,14 @@ async function veriricarToken(token) {
       divVerificado.classList.remove("d-none");
       setTimeout(() => {
         window.location.href = "iniciarSesion.html";
-      }, 4000);
+      }, 10000);
     } else {
       divError.classList.remove("d-none");
       setTimeout(() => {
         window.location.href = "index.html";
-      }, 5000);
+      }, 10000);
     }
   } catch (error) {
     console.error("Error al verificar el token:", error);
-    throw error;
   }
 }

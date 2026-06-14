@@ -15,31 +15,37 @@ const card1 = document.getElementById("cardRegistro1");
 const card2 = document.getElementById("cardRegistro2");
 const card3 = document.getElementById("cardRegistro3");
 
+document.addEventListener("DOMContentLoaded", comprobarToken);
+
 btnRegistrar1.addEventListener("click", async () => {
-  console.log("click");
+  const patronEmail = /\.[a-zA-Z]{2,6}$/;
   if (
     !inputEmailResgistro.value ||
     !inputNicknameRegistro.value ||
     !inputPasswordRegistro.value ||
     !inputConfirmPasswordRegistro.value
   ) {
-    alert("Por favor, complete todos los campos.");
+    notificar("Por favor, complete todos los campos.", "error");
+    return;
+  }
+
+  if (!patronEmail.test(inputEmailResgistro.value)) {
+    notificar("El correo electrónico no es válido.", "error");
     return;
   }
 
   if (inputPasswordRegistro.value !== inputConfirmPasswordRegistro.value) {
-    alert("Las contraseñas no coinciden.");
+    notificar("Las contraseñas no coinciden.", "error");
     return;
   }
 
   const duplicado = await verificarEmailDuplicado(inputEmailResgistro.value);
 
   if (duplicado) {
-    new PNotify({
-      title: "Error",
-      text: "El correo ya está registrado, por favor use otro.",
-      type: "error",
-    });
+    notificar(
+      "Correo electrónico ya registrado. Por favor, use otro correo.",
+      "error",
+    );
     return;
   }
 
@@ -48,7 +54,6 @@ btnRegistrar1.addEventListener("click", async () => {
 });
 
 btnRegistrar2.addEventListener("click", async () => {
-  console.log("click2");
   const email = inputEmailResgistro.value;
   const nickname = inputNicknameRegistro.value;
   const password = inputPasswordRegistro.value;
@@ -56,7 +61,7 @@ btnRegistrar2.addEventListener("click", async () => {
   const presupuesto = inputPresupuesto.value;
 
   if (!email || !nickname || !password || !confirmPassword || !presupuesto) {
-    alert("Por favor, complete todos los campos.");
+    notificar("Por favor, complete todos los campos.", "error");
     return;
   }
 
@@ -72,13 +77,12 @@ btnRegistrar2.addEventListener("click", async () => {
     card3.classList.remove("d-none");
     setTimeout(() => {
       window.location.href = "iniciarSesion.html";
-    }, 3500);
+    }, 10000);
   } else {
-    new PNotify({
-      title: "Error",
-      text: "Ocurrió un error al registrar el usuario, por favor intente de nuevo.",
-      type: "error",
-    });
+    notificar(
+      "Error al registrar usuario. Por favor, intente nuevamente.",
+      "error",
+    );
   }
 });
 
@@ -95,7 +99,7 @@ async function registrarUsuario(
   presupuesto,
 ) {
   try {
-    const res = await fetch("http://127.0.0.1:8000/usuarios/register", {
+    const res = await fetch(`${URL_BASE}/usuarios/register`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -121,25 +125,19 @@ async function registrarUsuario(
 
 async function verificarEmailDuplicado(email) {
   try {
-    const res = await fetch(
-      "http://127.0.0.1:8000/usuarios/register/duplicado",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email }),
+    const res = await fetch(`${URL_BASE}/usuarios/register/duplicado`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
       },
-    );
+      body: JSON.stringify({ email }),
+    });
 
     if (!res.ok) {
-      const error = await res.json();
-      console.warn(error.detail);
       return true;
     }
     return false;
   } catch (error) {
     console.warn("Error al verificar email duplicado:", error);
-    return true;
   }
 }

@@ -29,18 +29,13 @@
       href="/imagenes/favicon.png"
       type="image/x-icon"
     />
-    <style>
-      body {
-        font-family: "Sora", sans-serif;
-        background-color: #f8f9fa;
-      }
-    </style>
+
     <title>Control Cartos — Gastos</title>
   </head>
   <body>
     <!-- NAVBAR -->
     <nav class="navbar navbar-dark bg-dark fixed-top">
-      <div class="container-fluid">
+      <div class="container">
         <div class="d-flex align-items-center gap-2">
           <a
             class="navbar-brand d-flex align-items-center"
@@ -48,7 +43,7 @@
           >
             <img src="/imagenes/logo.png" alt="logo" class="me-2 img_logo" />
             <span class="d-none d-sm-inline"
-              >Control <span class="text-primary">Cartos</span></span
+              >Control <span class="text-success">Cartos</span></span
             >
           </a>
           <a href="dashboard.html" class="btn btn-outline-secondary btn-sm">
@@ -57,7 +52,7 @@
         </div>
         <div class="dropdown">
           <img
-            src="/imagenes/avatar.png"
+            src=""
             alt="perfil"
             width="38"
             height="38"
@@ -66,6 +61,7 @@
             data-bs-toggle="dropdown"
             aria-expanded="false"
             style="cursor: pointer; object-fit: cover"
+            id="fotoDropdown"
           />
           <ul class="dropdown-menu dropdown-menu-end dropdown-menu-dark">
             <li>
@@ -85,7 +81,9 @@
             </li>
             <li><hr class="dropdown-divider" /></li>
             <li>
-              <a class="dropdown-item text-danger" href="login.html"
+              <a
+                class="dropdown-item text-danger log-out"
+                href="iniciarSesion.html"
                 ><i class="bi bi-box-arrow-right me-2"></i>Cerrar sesión</a
               >
             </li>
@@ -99,6 +97,9 @@
       <div class="d-flex justify-content-between align-items-center mb-4 mt-3">
         <h4 class="mb-0">Mis gastos</h4>
         <div class="d-flex gap-2">
+          <a class="btn btn-outline-secondary btn-sm" href="categorias.html">
+            <i class="bi bi-tags me-1"></i>Categorias
+          </a>
           <button class="btn btn-primary btn-sm" id="btnAbrirAgregarGasto">
             <i class="bi bi-plus-circle me-1"></i>Agregar gasto
           </button>
@@ -106,7 +107,7 @@
             class="btn btn-outline-primary btn-sm"
             id="btnAbrirAgregarGastoOCR"
           >
-            <i class="bi bi-camera me-1"></i>Agregar con OCR
+            <i class="bi bi-camera me-1"></i>Agregar gasto con OCR
           </button>
         </div>
       </div>
@@ -156,7 +157,7 @@
                 <input
                   type="number"
                   class="form-control"
-                  name="monto"
+                  name="monto_gasto"
                   placeholder="0.00"
                   step="0.01"
                   required
@@ -179,7 +180,8 @@
                   type="text"
                   class="form-control"
                   name="descripcion"
-                  placeholder="Ej: Mercadona"
+                  maxlength="20"
+                  placeholder="Maximo 20 caracteres"
                 />
               </div>
             </form>
@@ -189,6 +191,94 @@
               type="submit"
               form="formAgregarGasto"
               class="btn btn-primary"
+            >
+              Guardar gasto
+            </button>
+            <button
+              type="button"
+              class="btn btn-outline-secondary"
+              data-bs-dismiss="modal"
+            >
+              Cancelar
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODAL AGREGAR GASTO OCR -->
+    <div
+      class="modal fade"
+      id="modalAgregarGastoOCR"
+      tabindex="-1"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header bg-primary text-white">
+            <h5 class="modal-title">Agregar gasto con OCR</h5>
+            <button
+              type="button"
+              class="btn-close btn-close-white"
+              data-bs-dismiss="modal"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <form id="formAgregarGastoOCR">
+              <div class="mb-3">
+                <label class="form-label">Sube tu ticket</label>
+                <input
+                  type="file"
+                  class="form-control"
+                  id="ocrArchivo"
+                  accept="image/*,.pdf"
+                />
+                <small class="text-muted"
+                  >Formatos permitidos: JPG, PNG, PDF</small
+                >
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Monto</label>
+                <input
+                  type="number"
+                  class="form-control"
+                  id="ocrMonto"
+                  placeholder="Se rellenará automáticamente"
+                />
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Categoría</label>
+                <select class="form-select" id="ocrCategoria">
+                  <option value="">Selecciona una categoría</option>
+                </select>
+              </div>
+              <div class="mb-3">
+                <label class="form-label"
+                  >Descripción <span class="text-muted">(opcional)</span></label
+                >
+                <input
+                  type="text"
+                  class="form-control"
+                  id="ocrDescripcion"
+                  maxlength="20"
+                  placeholder="Maximo 20 caracteres"
+                />
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-outline-primary me-2"
+              id="btnProcesarOCR"
+            >
+              <i class="bi bi-camera me-1"></i>Procesar ticket
+            </button>
+            <button
+              type="submit"
+              form="formAgregarGastoOCR"
+              class="btn btn-primary"
+              id="btnGuardarGastoOCR"
             >
               Guardar gasto
             </button>
@@ -229,7 +319,7 @@
                   type="number"
                   class="form-control"
                   id="editGastoMonto"
-                  name="monto"
+                  name="monto_gasto"
                   step="0.01"
                   required
                 />
@@ -252,6 +342,8 @@
                   class="form-control"
                   id="editGastoDescripcion"
                   name="descripcion"
+                  maxlength="20"
+                  placeholder="Maximo 20 caracteres"
                 />
               </div>
             </form>
@@ -323,6 +415,7 @@
     ></script>
     <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js"></script>
+    <script src="js/utils.js" defer></script>
     <script src="js/gastos.js" defer></script>
   </body>
 </html>

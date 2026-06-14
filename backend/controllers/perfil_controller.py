@@ -60,7 +60,7 @@ def cambiar_presupuesto(user_id, presupuesto):
 
 async def cambiar_foto(user_id, foto: UploadFile):
     try:
-        extensiones_permitidas = ["image/jpeg", "image/png", "image/webp"]
+        extensiones_permitidas = ["image/jpeg", "image/png", "image/webp", "image/avif"]
         if foto.content_type not in extensiones_permitidas:
             raise HTTPException(status_code=400, detail="Formato de imagen no permitido")
         

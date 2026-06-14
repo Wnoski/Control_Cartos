@@ -23,7 +23,7 @@ app.add_middleware(
 
 os.makedirs("uploads/fotos", exist_ok=True)
 
-app.mount("/fotos", StaticFiles(directory="uploads/fotos"), name="fotos")
+app.mount("/uploads/fotos", StaticFiles(directory="uploads/fotos"), name="fotos")
 
 app.include_router(router_usuario, prefix="/usuarios", tags=["Usuarios"])
 

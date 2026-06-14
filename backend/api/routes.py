@@ -70,8 +70,8 @@ def eliminar_categoria(categoria_id: int, user_id: int = Depends(verificar_token
 router_gastos = APIRouter()
 
 @router_gastos.get("/")
-def obtener_gastos(user_id: int = Depends(verificar_token), nombre_categoria: str | None = None):
-    return gastos_controller.obtener_gastos_de_usuario(user_id, nombre_categoria)
+def obtener_gastos(user_id: int = Depends(verificar_token)):
+    return gastos_controller.obtener_gastos_de_usuario(user_id)
 
 @router_gastos.post("/")
 def crear_gasto(datos: GastosRequest, user_id: int = Depends(verificar_token)):
@@ -79,7 +79,7 @@ def crear_gasto(datos: GastosRequest, user_id: int = Depends(verificar_token)):
 
 @router_gastos.put("/{gasto_id}")
 def editar_gasto(datos: GastosEditRequest, gasto_id: int, user_id: int = Depends(verificar_token)):
-    
+    print("llega")
     return gastos_controller.editar_gasto(user_id, gasto_id, datos.model_dump())
 
 @router_gastos.delete("/{gasto_id}")

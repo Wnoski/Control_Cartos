@@ -35,7 +35,7 @@
 
     <!-- NAVBAR -->
     <nav class="navbar navbar-dark bg-dark fixed-top">
-      <div class="container-fluid">
+      <div class="container">
         <a class="navbar-brand d-flex align-items-center" href="#">
           <img src="/imagenes/logo.png" alt="logo" class="me-2 img_logo" />
           <span class="d-none d-sm-inline"
@@ -43,12 +43,14 @@
           >
         </a>
         <div class="text-center d-none d-md-block">
-          <h6 class="text-white mb-0">Bienvenido de nuevo</h6>
+          <h6 class="text-white mb-0">
+            Bienvenido <span class="text-success" id="welcoName"></span>
+          </h6>
           <small class="text-secondary">Gestiona tus finanzas</small>
         </div>
         <div class="dropdown">
           <img
-            src="/imagenes/avatar.png"
+            src=""
             alt="perfil"
             width="38"
             height="38"
@@ -71,6 +73,11 @@
             <li>
               <a class="dropdown-item" href="categorias.html"
                 ><i class="bi bi-tags me-2"></i>Categorías</a
+              >
+            </li>
+            <li>
+              <a class="dropdown-item" href="gastos.html"
+                ><i class="bi bi-table me-2"></i>Gastos</a
               >
             </li>
             <li><hr class="dropdown-divider" /></li>
@@ -185,7 +192,7 @@
                 Mes anterior
               </button>
               <button class="btn btn-outline-primary" id="btnHistorico">
-                3 meses
+                Histórico
               </button>
             </div>
           </div>
@@ -239,19 +246,14 @@
                   type="text"
                   class="form-control"
                   name="descripcion"
-                  placeholder="Ej: Mercadona"
+                  maxlength="20"
+                  placeholder="Maximo 20 caracteres"
                 />
               </div>
             </form>
           </div>
+
           <div class="modal-footer">
-            <button
-              type="button"
-              class="btn btn-outline-secondary"
-              data-bs-dismiss="modal"
-            >
-              Cancelar
-            </button>
             <button
               type="submit"
               form="formAgregarGasto"
@@ -259,6 +261,13 @@
               id="btnGuardarGasto"
             >
               Guardar gasto
+            </button>
+            <button
+              type="button"
+              class="btn btn-outline-secondary"
+              data-bs-dismiss="modal"
+            >
+              Cancelar
             </button>
           </div>
         </div>
@@ -283,53 +292,49 @@
             ></button>
           </div>
           <div class="modal-body">
-            <div class="mb-3">
-              <label class="form-label">Sube tu ticket</label>
-              <input
-                type="file"
-                class="form-control"
-                id="ocrArchivo"
-                accept="image/*,.pdf"
-              />
-              <small class="text-muted"
-                >Formatos permitidos: JPG, PNG, PDF</small
-              >
-            </div>
-            <div class="mb-3">
-              <label class="form-label">Monto</label>
-              <input
-                type="number"
-                class="form-control"
-                id="ocrMonto"
-                placeholder="Se rellenará automáticamente"
-              />
-            </div>
-            <div class="mb-3">
-              <label class="form-label">Categoría</label>
-              <select class="form-select" id="ocrCategoria">
-                <option value="">Selecciona una categoría</option>
-              </select>
-            </div>
-            <div class="mb-3">
-              <label class="form-label"
-                >Descripción <span class="text-muted">(opcional)</span></label
-              >
-              <input
-                type="text"
-                class="form-control"
-                id="ocrDescripcion"
-                placeholder="Se rellenará automáticamente"
-              />
-            </div>
+            <form id="formAgregarGastoOCR">
+              <div class="mb-3">
+                <label class="form-label">Sube tu ticket</label>
+                <input
+                  type="file"
+                  class="form-control"
+                  id="ocrArchivo"
+                  accept="image/*,.pdf"
+                />
+                <small class="text-muted"
+                  >Formatos permitidos: JPG, PNG, PDF</small
+                >
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Monto</label>
+                <input
+                  type="number"
+                  class="form-control"
+                  id="ocrMonto"
+                  placeholder="Se rellenará automáticamente"
+                />
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Categoría</label>
+                <select class="form-select" id="ocrCategoria">
+                  <option value="">Selecciona una categoría</option>
+                </select>
+              </div>
+              <div class="mb-3">
+                <label class="form-label"
+                  >Descripción <span class="text-muted">(opcional)</span></label
+                >
+                <input
+                  type="text"
+                  class="form-control"
+                  id="ocrDescripcion"
+                  maxlength="20"
+                  placeholder="Maximo 20 caracteres"
+                />
+              </div>
+            </form>
           </div>
           <div class="modal-footer">
-            <button
-              type="button"
-              class="btn btn-outline-secondary"
-              data-bs-dismiss="modal"
-            >
-              Cancelar
-            </button>
             <button
               type="button"
               class="btn btn-outline-primary me-2"
@@ -338,11 +343,19 @@
               <i class="bi bi-camera me-1"></i>Procesar ticket
             </button>
             <button
-              type="button"
+              type="submit"
+              form="formAgregarGastoOCR"
               class="btn btn-primary"
               id="btnGuardarGastoOCR"
             >
               Guardar gasto
+            </button>
+            <button
+              type="button"
+              class="btn btn-outline-secondary"
+              data-bs-dismiss="modal"
+            >
+              Cancelar
             </button>
           </div>
         </div>

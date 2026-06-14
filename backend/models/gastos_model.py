@@ -2,9 +2,6 @@ from config.database import create_connection
 
 def obtener_id_categoria(user_id, nombre_categoria):
     conexion = create_connection()
-
-    if not conexion:
-        return None
     
     try:
         with conexion.cursor() as cursor:
@@ -16,13 +13,11 @@ def obtener_id_categoria(user_id, nombre_categoria):
         print(f"Error al obtener id categoria: {e}")
         raise Exception("Error de base de datos")
     finally:
-        conexion.close()
+        if conexion:
+            conexion.close()
 
 def crear_gasto(user_id, categoria_id, monto, descripcion):
     conexion = create_connection()
-    
-    if not conexion:
-        return None
     
     try:
         with conexion.cursor() as cursor:
@@ -36,40 +31,29 @@ def crear_gasto(user_id, categoria_id, monto, descripcion):
         print(f"Error al crear gasto: {e}")
         raise Exception("Error de base de datos")
     finally:
-        conexion.close()
+        if conexion:
+            conexion.close()
 
-def obtener_gastos(user_id, nombre_categoria=None):
+def obtener_gastos(user_id):
     conexion = create_connection()
-    
-    if not conexion:
-        return None
     
     try:
         with conexion.cursor() as cursor:
-            if nombre_categoria:
-                sql = """SELECT g.id, g.monto_gasto, g.descripcion, g.fecha, c.nombre 
-                         FROM gastos g JOIN categorias c ON g.id_categoria = c.id
-                         WHERE g.id_usuario = %s AND c.categoria = %s
-                         ORDER BY g.fecha DESC"""
-                cursor.execute(sql, (user_id, nombre_categoria))
-            else:
                 sql = """SELECT g.id, g.monto_gasto, g.descripcion, g.fecha, c.nombre 
                          FROM gastos g JOIN categorias c ON g.id_categoria = c.id
                          WHERE g.id_usuario = %s
                          ORDER BY g.fecha DESC"""
                 cursor.execute(sql, (user_id,))
-            return cursor.fetchall()
+                return cursor.fetchall()
     except Exception as e:
         print(f"Error al obtener gastos: {e}")
         raise Exception("Error de base de datos")
     finally:
-        conexion.close()
+        if conexion:
+            conexion.close()
 
 def eliminar_gasto(gasto_id, user_id):
     conexion = create_connection()
-    
-    if not conexion:
-        return None
     
     try:
         with conexion.cursor() as cursor:
@@ -82,7 +66,8 @@ def eliminar_gasto(gasto_id, user_id):
         print(f"Error al eliminar gasto: {e}")
         raise Exception("Error de base de datos")
     finally:
-        conexion.close()
+       if conexion:
+            conexion.close()
         
 
 def editar_gasto(user_id, gasto_id, datos):
@@ -90,8 +75,8 @@ def editar_gasto(user_id, gasto_id, datos):
     
     try:
         with conexion.cursor() as cursor:
-            keys = [key for key, value in datos.items() if value is not None]
-            values = [value for value in datos.values() if value is not None]
+            keys = list(datos.keys())
+            values = list(datos.values())        
             campos = ", ".join([f"{key} = %s" for key in keys])
             values.append(gasto_id)
             values.append(user_id)

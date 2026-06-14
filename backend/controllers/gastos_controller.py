@@ -22,13 +22,14 @@ def crear_gasto(nombre_categoria, user_id, monto, descripcion = None):
         print(f"Error en el controller gasto: {e}")
         raise HTTPException(status_code=500, detail="Error interno del servidor")
     
-def obtener_gastos_de_usuario(user_id, nombre_categoria=None):
+def obtener_gastos_de_usuario(user_id):
     try:
-        gastos = gastos_model.obtener_gastos(user_id, nombre_categoria)
+        gastos = gastos_model.obtener_gastos(user_id)
         return {"status": "success", "data": gastos}
     except Exception as e:
         print(f"Error al obtener gastos: {e}")
         raise HTTPException(status_code=500, detail="Error interno del servidor")
+
 
 def eliminar_gasto_de_usuario(gasto_id, user_id):
     try:
@@ -41,6 +42,9 @@ def eliminar_gasto_de_usuario(gasto_id, user_id):
 
 def editar_gasto(user_id, gasto_id, datos):
     try:
+        id_categoria = gastos_model.obtener_id_categoria(user_id, datos["nombre_categoria"])
+        datos.pop("nombre_categoria")
+        datos.update({"id_categoria": id_categoria})
         gastos_model.editar_gasto(user_id, gasto_id, datos)
         return {"status": "success", "mensaje": "Gasto editado correctamente"}
     except Exception as e:

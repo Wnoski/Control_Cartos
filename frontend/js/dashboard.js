@@ -1,23 +1,38 @@
 // ==========================================
-// 1. SELECCIÓN DE ELEMENTOS DEL DOM
+// 1. REFERENCIAS AL DOM
 // ==========================================
-const URL_BASE = "http://127.0.0.1:8000";
-const cardPresupuesto = document.getElementById("cardPresupuesto");
 const cardCategorias = document.getElementById("cardCategorias");
 const grafica = document.getElementById("grafica").getContext("2d");
 const divBtnGrafica = document.getElementById("divBtnsGrafica");
 const divBotones = document.getElementById("divBtnsAccion");
 const formAgregarGasto = document.getElementById("formAgregarGasto");
-const btnGuardarGasto = document.getElementById("btnGuardarGasto");
-let token;
-// ==========================================
-// 2. INICIALIZACIÓN / EVENT LISTENERS
-// ==========================================
-document.addEventListener("DOMContentLoaded", comprobarToken);
 
+// Referencias tarjetas presupuesto
+const presupuestoMax = document.getElementById("presupuestoMax");
+const totalGastado = document.getElementById("totalGastado");
+const presupuestoRestante = document.getElementById("presupuestoRestante");
+const barraGlobal = document.getElementById("barraGlobal");
+const mensajeGlobal = document.getElementById("mensajeGlobal");
+const welcoName = document.getElementById("welcoName");
+
+let token;
+let graficaInstancia = null;
+
+// ==========================================
+// 2. INICIALIZACIÓN
+// ==========================================
+document.addEventListener("DOMContentLoaded", async () => {
+  token = await comprobarToken();
+  if (!token) return;
+  await obtenerDatosPerfil(token);
+  await obtenerDatosDashboard(token);
+});
+
+// ==========================================
+// 3. EVENT LISTENERS
+// ==========================================
 divBtnGrafica.addEventListener("click", async (e) => {
   if (e.target.tagName !== "BUTTON") return;
-
   e.target.id === "btnMesActual"
     ? await obtenerDatosDashboard(token)
     : e.target.id === "btnMesAnterior"
@@ -37,7 +52,7 @@ divBotones.addEventListener("click", async (e) => {
       ).show();
       break;
     case "agregarGastoOCR":
-      await cargarCategoriasEnSelect("ocrCategorias");
+      await cargarCategoriasEnSelect("ocrCategoria");
       bootstrap.Modal.getOrCreateInstance(
         document.getElementById("modalAgregarGastoOCR"),
       ).show();
@@ -53,25 +68,30 @@ divBotones.addEventListener("click", async (e) => {
 
 formAgregarGasto.addEventListener("submit", async (e) => {
   e.preventDefault();
-
-  const form = new FormData(formAgregarGasto);
-  const formObj = Object.fromEntries(form);
-  console.log(formObj);
+  const formObj = Object.fromEntries(new FormData(formAgregarGasto));
   bootstrap.Modal.getOrCreateInstance(
     document.getElementById("modalAgregarGasto"),
   ).hide();
-
   const agregado = await agregarGasto(formObj);
-
   if (agregado) {
     formAgregarGasto.reset();
     await obtenerDatosDashboard(token);
-    alert("Gasto agregado");
+    notificar("Gasto agregado correctamente", "success");
   } else {
-    alert("gasto no agregado");
+    notificar("Error al agregar gasto", "error");
   }
 });
 
+ulFoto.addEventListener("click", (e) => {
+  const btnCerrar = e.target.closest(".log-out");
+  if (!btnCerrar) return;
+  localStorage.clear();
+  document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+});
+
+// ==========================================
+// 4. PETICIONES API
+// ==========================================
 async function agregarGasto(form) {
   try {
     const res = await fetch(`${URL_BASE}/gastos/`, {
@@ -82,82 +102,10 @@ async function agregarGasto(form) {
       },
       body: JSON.stringify(form),
     });
-    if (res.ok) {
-      console.log(res.json());
-      return true;
-    }
-    return false;
+    return res.ok;
   } catch (error) {
-    console.warn("Error el intentar agregar un gasto: ", error);
+    console.error("Error al agregar gasto:", error);
     return false;
-  }
-}
-
-// ==========================================
-// 3. LÓGICA CENTRAL Y PETICIONES API
-// ==========================================
-async function comprobarToken() {
-  const cookieToken = obtenerCookie("token");
-  const localToken = localStorage.getItem("token");
-  const tokenAUsar = cookieToken || localToken;
-
-  if (!tokenAUsar) {
-    window.location.href = "index.html";
-    return;
-  }
-
-  const valido = await verificarTiempoToken(tokenAUsar);
-  if (!valido) {
-    document.cookie = "token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
-    localStorage.removeItem("token");
-    window.location.href = "index.html";
-    return;
-  }
-
-  localStorage.setItem("token", tokenAUsar);
-  token = tokenAUsar;
-
-  await obtenerPerfil(token);
-  await obtenerDatosDashboard(token);
-}
-
-function obtenerCookie(nombre) {
-  const cookies = document.cookie.split(";");
-  const cookie = cookies.find((c) => c.trim().startsWith(nombre));
-  return cookie ? cookie.split("=")[1] : null;
-}
-
-async function verificarTiempoToken(token) {
-  try {
-    const res = await fetch(`${URL_BASE}/usuarios/tiempo-token`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-
-    if (!res.ok) {
-      const obj_res = await res.json();
-      localStorage.removeItem("token");
-      window.location.href = "index.html";
-      return false;
-    }
-
-    return true;
-  } catch (error) {
-    console.warn("Error de red:", error);
-    return false;
-  }
-}
-
-async function obtenerPerfil(token) {
-  try {
-    const res = await fetch(`${URL_BASE}/perfil/`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    if (res.ok) {
-      const obj_res = await res.json();
-      return obj_res.data;
-    }
-  } catch (error) {
-    console.error("Error al obtener perfil:", error);
   }
 }
 
@@ -199,14 +147,15 @@ async function obtenerGraficaHistorico(token) {
     });
     if (res.ok) {
       const obj_res = await res.json();
-      renderGrafica(obj_res.data, "historico");
+      const datos = procesarHistorico(obj_res.data);
+      renderGrafica(datos, "historico");
     }
   } catch (error) {
     console.error("Error al obtener histórico:", error);
   }
 }
 
-async function obtenerCategorias(token) {
+async function obtenerCategorias() {
   try {
     const res = await fetch(`${URL_BASE}/categorias/`, {
       headers: { Authorization: `Bearer ${token}` },
@@ -223,67 +172,91 @@ async function obtenerCategorias(token) {
 }
 
 async function cargarCategoriasEnSelect(selectId) {
-  const categorias = await obtenerCategorias(token);
+  const categorias = await obtenerCategorias();
   const select = document.getElementById(selectId);
-
   if (!categorias || categorias.length === 0) {
     select.innerHTML = `<option value="">Sin categorías</option>`;
     return;
   }
-
   select.innerHTML = `<option value="" selected>Elige una categoría</option>
     ${categorias.map((c) => `<option value="${c.nombre}">${c.nombre}</option>`).join("")}`;
 }
 
 // ==========================================
-// 4. FUNCIONES DE RENDERIZADO
+// 5. RENDERIZADO
 // ==========================================
 function renderPresupuesto(datos) {
   const mensaje =
-    datos.porcentaje_global >= 100
+    datos.porcentaje_global > 100
       ? "🔴 Límite superado"
-      : datos.porcentaje_global >= 75
-        ? "🟡 Cerca del límite"
-        : "🟢 Vas bien";
+      : datos.porcentaje_global === 100
+        ? "🔴 Has llegado al límite"
+        : datos.porcentaje_global >= 75
+          ? "🟡 Cerca del límite"
+          : datos.porcentaje_global >= 60
+            ? "🟡 Gastos "
+            : datos.porcentaje_global >= 40
+              ? "🟢 Estable"
+              : datos.porcentaje_global > 0
+                ? "🟢 Todo bajo control"
+                : "Sin gastos aún";
 
   const colorBarra =
     datos.porcentaje_global >= 100
       ? "bg-danger"
-      : datos.porcentaje_global >= 75
+      : datos.porcentaje_global >= 60
         ? "bg-warning"
         : "bg-success";
 
-  cardPresupuesto.innerHTML = `
-    <h5 class="card-title text-secondary">Presupuesto mensual</h5>
-    <h2>${datos.total_gastado_global} €</h2>
-    <p class="text-secondary mb-1">de <span>${datos.presupuesto_maximo} €</span></p>
-    <div class="progress mb-2" style="height:8px;">
-      <div class="progress-bar ${colorBarra}" style="width:${Math.min(datos.porcentaje_global, 100)}%"></div>
-    </div>
-    <p class="mb-0">${mensaje}</p>`;
+  const restante = (
+    datos.presupuesto_maximo - datos.total_gastado_global
+  ).toFixed(2);
+
+  presupuestoMax.textContent = `${datos.presupuesto_maximo} €`;
+  totalGastado.textContent = `${datos.total_gastado_global} €`;
+
+  if (restante > 0) {
+    presupuestoRestante.classList.remove("text-danger");
+    presupuestoRestante.textContent = `${restante} €`;
+  } else {
+    presupuestoRestante.classList.add("text-danger");
+    presupuestoRestante.textContent = `${restante} €`;
+  }
+  barraGlobal.className = `progress-bar ${colorBarra}`;
+  barraGlobal.style.width = `${Math.min(datos.porcentaje_global, 100)}%`;
+  mensajeGlobal.textContent = mensaje;
 }
 
 function renderCategorias(categorias) {
   if (!categorias || categorias.length === 0) {
-    cardCategorias.innerHTML = `
-      <h5>Aún sin categorías</h5>
-      <p>¡Anímate a agregarlas para tener más control de tus finanzas!</p>`;
+    cardCategorias.innerHTML = `<div class="text-center py-5 text-muted">
+          <i class="bi bi-tags fs-1 d-block mb-2"></i>
+            <p class="text-muted">Aún sin categorías. ¡Anímate a agregarlas para tener más control de tus finanzas!</p>
+      </div>`;
+
     return;
   }
-
   cardCategorias.innerHTML = categorias
     .map((categoria) => {
       const mensaje =
-        categoria.porcentaje >= 100
+        categoria.porcentaje > 100
           ? "🔴 Límite superado"
-          : categoria.porcentaje >= 75
-            ? "🟡 Cerca del límite"
-            : "🟢 Vas bien";
+          : categoria.porcentaje === 100
+            ? "🔴 Has llegado al límite"
+            : categoria.porcentaje >= 75
+              ? "🟡 Cerca del límite"
+              : categoria.porcentaje >= 60
+                ? "🟡 Buen ritmo, pero ojo con los cartos"
+                : categoria.porcentaje >= 40
+                  ? "🟢 Estable"
+                  : categoria.porcentaje > 0
+                    ? "🟢 Todo bajo control"
+                    : "Sin gastos aún";
 
       const colorBarra =
         categoria.porcentaje >= 100
           ? "bg-danger"
-          : categoria.porcentaje >= 75
+          : categoria.porcentaje >= 60
             ? "bg-warning"
             : "bg-success";
 
@@ -295,15 +268,17 @@ function renderCategorias(categorias) {
       <div class="progress" style="height:7px;">
         <div class="progress-bar ${colorBarra}" style="width:${Math.min(categoria.porcentaje, 100)}%"></div>
       </div>
-      <small class="text-secondary">${mensaje}</small>
+      <small class="text-muted">${mensaje}</small>
     </div>`;
     })
     .join("");
 }
 
-let graficaInstancia = null;
-
 function renderGrafica(datos, temporalidad) {
+  if (!datos || datos.length === 0) {
+    grafica.innerHTML = `<p class="text-muted text-center mt-3">Aún sin datos para mostrar en la gráfica.</p>`;
+    return;
+  }
   if (graficaInstancia) graficaInstancia.destroy();
 
   const paleta = [
@@ -314,13 +289,11 @@ function renderGrafica(datos, temporalidad) {
     "#9b59b6",
     "#e67e22",
   ];
-
   let labels, gastos, colores, tipo;
 
   if (temporalidad === "historico") {
-    const historico = procesarHistorico(datos);
-    labels = historico.map((h) => `${h.mes}/${h.año}`);
-    gastos = historico.map((h) => h.total);
+    labels = datos.map((h) => `${h.mes}/${h.año}`);
+    gastos = datos.map((h) => h.total);
     colores = "#e74c3c";
     tipo = "line";
   } else {
@@ -333,13 +306,9 @@ function renderGrafica(datos, temporalidad) {
   graficaInstancia = new Chart(grafica, {
     type: tipo,
     data: {
-      labels: labels,
+      labels,
       datasets: [
-        {
-          label: "Gastado €",
-          data: gastos,
-          backgroundColor: colores,
-        },
+        { label: "Gastado €", data: gastos, backgroundColor: colores },
       ],
     },
   });
@@ -354,15 +323,3 @@ function procesarHistorico(datos) {
   });
   return Object.values(meses);
 }
-
-//Cerrar Sesion
-
-const ulFoto = document.getElementById("ul-foto");
-
-ulFoto.addEventListener("click", (e) => {
-  const btnCerrar = e.target.closest(".log-out");
-  if (!btnCerrar) return;
-
-  localStorage.clear();
-  document.cookie = "token =; expires = Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-});

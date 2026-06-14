@@ -1,16 +1,53 @@
+// ==========================================
+// 1. SELECCIÓN DE ELEMENTOS DEL DOM
+// ==========================================
 const formLogin = document.getElementById("formLogin");
-
 const emailLogin = document.getElementById("emailLogin");
-
 const passwordLogin = document.getElementById("passwordLogin");
-
-const btnLogin = document.getElementById("btnEnviarLogin");
-
 const checkboxLogin = document.getElementById("recordarLogin");
 
-formLogin.addEventListener("submit", (e) => e.preventDefault());
+document.addEventListener("DOMContentLoaded", comprobarToken);
 
-btnLogin.addEventListener("click", async () => {
+// ==========================================
+// 2. FUNCIONES (Lógica / API)
+// ==========================================
+async function iniciarSesion(email, password, recordar = false) {
+  try {
+    const res = await fetch(`${URL_BASE}/usuarios/login/${recordar}`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        email: email,
+        password: password,
+      }),
+    });
+
+    const data = await res.json();
+
+    if (res.ok) {
+      localStorage.setItem("token", data.usuario.token);
+      if (recordar) {
+        document.cookie = `token=${data.usuario.token}; max-age=2592000; path=/; SameSite=Strict`;
+      }
+      return true;
+    }
+
+    notificar(data.detail, "error");
+    return false;
+  } catch (error) {
+    console.error("Error al iniciar sesión:", error);
+    return false;
+  }
+}
+
+// ==========================================
+// 3. ESCUCHADORES DE EVENTOS
+// ==========================================
+formLogin.addEventListener("submit", async (e) => {
+  e.preventDefault();
+
   const email = emailLogin.value;
   const password = passwordLogin.value;
   const recordar = checkboxLogin.checked;
@@ -24,44 +61,5 @@ btnLogin.addEventListener("click", async () => {
 
   if (conectado) {
     window.location.href = "dashboard.html";
-  } else {
-    new PNotify({
-      title: "Error",
-      text: "Correo o contraseña incorrectos intentelo de nuevo",
-      type: "error",
-    });
   }
 });
-
-async function iniciarSesion(email, password, recordar = false) {
-  try {
-    const res = await fetch(
-      `http://localhost:8000/usuarios/login/${recordar}`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          email: email,
-          password: password,
-        }),
-      },
-    );
-    console.log(res);
-    const data = await res.json();
-    console.log(data.detail);
-    if (res.ok) {
-      localStorage.setItem("token", data.usuario.token);
-      if (recordar) {
-        document.cookie = `token=${data.usuario.token}; max-age=2592000; path=/; SameSite=Strict`;
-      }
-      return true;
-    }
-    notificar(data.detail, "error");
-    return false;
-  } catch (error) {
-    console.error("Error al iniciar sesión:", error);
-    return false;
-  }
-}
