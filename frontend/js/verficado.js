@@ -2,7 +2,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   const token = extraerToken();
   if (token) {
     try {
-      const userData = await veriricarToken(token);
+      const userData = await verificarToken(token);
     } catch (error) {
       console.error("Error al verificar el token:", error);
     }
@@ -18,21 +18,19 @@ function extraerToken() {
   return token;
 }
 
-async function veriricarToken(token) {
+async function verificarToken(token) {
   try {
-    const res = await fetch(
-      `http://127.0.0.1:8000/usuarios/verificar/${token}`,
-    );
+    const res = await fetch(`${URL_BASE}/usuarios/verificar/${token}`);
 
     if (res.ok) {
       divVerificado.classList.remove("d-none");
       setTimeout(() => {
-        window.location.href = "iniciarSesion.html";
+        window.location.replace("iniciarSesion.html");
       }, 10000);
     } else {
       divError.classList.remove("d-none");
       setTimeout(() => {
-        window.location.href = "index.html";
+        window.location.replace("index.html");
       }, 10000);
     }
   } catch (error) {

@@ -19,6 +19,7 @@ const btnGuardarPresupuesto = document.getElementById("btnGuardarPresupuesto");
 const btnConfirmarEliminarCuenta = document.getElementById(
   "btnConfirmarEliminarCuenta",
 );
+const btnMostrar = document.getElementById("mostrarContraseña");
 
 const modalEliminarCuenta = bootstrap.Modal.getOrCreateInstance(
   document.getElementById("modalEliminarCuenta"),
@@ -27,23 +28,16 @@ const modalEliminarCuenta = bootstrap.Modal.getOrCreateInstance(
 // ==========================================
 // 2. INICIALIZACIÓN
 // ==========================================
-document.addEventListener("DOMContentLoaded", comprobarToken);
+document.addEventListener("DOMContentLoaded", async () => {
+  token = await comprobarToken();
+
+  const perfil = await obtenerDatosPerfil();
+  renderPerfil(perfil);
+});
 
 // ==========================================
 // 3. LÓGICA CENTRAL Y PETICIONES API
 // ==========================================
-async function comprobarToken() {
-  token = localStorage.getItem("token");
-  const payload = JSON.parse(atob(token.split(".")[1]));
-  const expirado = payload.exp * 1000 < Date.now();
-
-  if (!token || expirado) {
-    window.location.href = "index.html";
-    return;
-  }
-  const perfil = await obtenerDatosPerfil();
-  renderPerfil(perfil);
-}
 
 async function obtenerDatosPerfil() {
   try {
@@ -167,8 +161,8 @@ function renderPerfil(perfil) {
 btnGuardarNickname.addEventListener("click", async () => {
   const nick = nuevoNickname.value.trim();
   if (!nick) return;
-  const ok = await cambiarNickname(nick);
-  if (ok) {
+  const cambiado = await cambiarNickname(nick);
+  if (cambiado) {
     nombreUsuario.textContent = nick;
     nuevoNickname.value = "";
     notificar("Nickname actualizado correctamente", "success");
@@ -190,8 +184,8 @@ btnGuardarPassword.addEventListener("click", async () => {
     notificar("Las contraseñas no coinciden", "error");
     return;
   }
-  const ok = await cambiarPassword(actual, nueva, confirmar);
-  if (ok) {
+  const cambiada = await cambiarPassword(actual, nueva, confirmar);
+  if (cambiada) {
     passwordActual.value = "";
     passwordNueva.value = "";
     passwordConfirmar.value = "";
@@ -225,11 +219,32 @@ inputFoto.addEventListener("change", async (e) => {
 });
 
 btnConfirmarEliminarCuenta.addEventListener("click", async () => {
-  const ok = await eliminarCuenta();
-  if (ok) {
+  btnConfirmarEliminarCuenta.disabled = true;
+  const eliminada = await eliminarCuenta();
+  if (eliminada) {
+    notificar(
+      "Cuenta eliminada correctamente, Esperamos verte de nuevo por aqui, puedes registrarse nuevamente cuando quieras",
+      "success",
+    );
+    document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
     localStorage.removeItem("token");
-    window.location.href = "index.html";
+    setTimeout(() => {
+      window.location.replace("index.html");
+    }, 3000);
   } else {
+    btnConfirmarEliminarCuenta.disabled = false;
     notificar("Error al eliminar la cuenta", "error");
+  }
+});
+
+btnMostrar.addEventListener("click", function () {
+  if (this.checked) {
+    passwordActual.type = "text";
+    passwordNueva.type = "text";
+    passwordConfirmar.type = "text";
+  } else {
+    passwordActual.type = "password";
+    passwordNueva.type = "password";
+    passwordConfirmar.type = "password";
   }
 });

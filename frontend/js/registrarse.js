@@ -3,6 +3,8 @@ const inputPasswordRegistro = document.getElementById("passwordRegistro");
 const inputConfirmPasswordRegistro = document.getElementById(
   "confirmPasswordRegistro",
 );
+
+const btnMostrar = document.getElementById("mostrarContraseña");
 const inputNicknameRegistro = document.getElementById("nicknameRegistro");
 
 const inputPresupuesto = document.getElementById("presupuesto");
@@ -141,3 +143,13 @@ async function verificarEmailDuplicado(email) {
     console.warn("Error al verificar email duplicado:", error);
   }
 }
+
+btnMostrar.addEventListener("click", function () {
+  if (this.checked) {
+    inputPasswordRegistro.type = "text";
+    inputConfirmPasswordRegistro.type = "text";
+  } else {
+    inputPasswordRegistro.type = "password";
+    inputConfirmPasswordRegistro.type = "password";
+  }
+});

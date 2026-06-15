@@ -1,6 +1,7 @@
 const form = document.getElementById("formRecuperar");
 const nPassword = document.getElementById("newPassword");
 const confirmPassword = document.getElementById("confirmPassword");
+const btnMostrar = document.getElementById("mostrarContraseña");
 
 form.addEventListener("submit", async (e) => {
   e.preventDefault();
@@ -8,13 +9,11 @@ form.addEventListener("submit", async (e) => {
   if (!nPassword.value || !confirmPassword.value) {
     notificar("Debes rellenar ambos campos", "error");
     return;
-    po;
   }
 
   if (nPassword.value !== confirmPassword.value) {
     notificar("Ambas contraseñas deben coincidir", "error");
     return;
-    n;
   }
 
   const botonSubmit = e.submitter;
@@ -78,3 +77,13 @@ async function cambiarContraseña(token, new_password, confirm_password) {
     return false;
   }
 }
+
+btnMostrar.addEventListener("click", function () {
+  if (this.checked) {
+    nPassword.type = "text";
+    confirmPassword.type = "text";
+  } else {
+    nPassword.type = "password";
+    confirmPassword.type = "password";
+  }
+});

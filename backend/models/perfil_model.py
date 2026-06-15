@@ -3,9 +3,6 @@ from config.database import create_connection
 def obtener_perfil(user_id):
     conexion = create_connection()
     
-    if not conexion:
-        return None
-    
     try:
         with conexion.cursor() as cursor:
             sql = "SELECT id, nombre_usuario, email, password, presupuesto_maximo_mensual, foto_perfil FROM usuarios WHERE id = %s"
@@ -15,14 +12,12 @@ def obtener_perfil(user_id):
         print(f"Error al obtener perfil: {e}")
         raise Exception("Error de base de datos")
     finally:
-        conexion.close()
+         if conexion:
+            conexion.close()
 
 def cambiar_nickname(user_id, nickname):
     conexion = create_connection()
-    
-    if not conexion:
-        return None
-    
+ 
     try:
         with conexion.cursor() as cursor:
             sql = "UPDATE usuarios SET nombre_usuario = %s WHERE id = %s"
@@ -34,14 +29,12 @@ def cambiar_nickname(user_id, nickname):
         print(f"Error al cambiar nickname: {e}")
         raise Exception("Error de base de datos")
     finally:
-        conexion.close()
+        if conexion:
+            conexion.close()
 
 def cambiar_password(user_id, password):
     conexion = create_connection()
-    
-    if not conexion:
-        return None
-    
+
     try:
         with conexion.cursor() as cursor:
             sql = "UPDATE usuarios SET password = %s WHERE id = %s"
@@ -53,13 +46,11 @@ def cambiar_password(user_id, password):
         print(f"Error al cambiar password: {e}")
         raise Exception("Error de base de datos")
     finally:
-        conexion.close()
+         if conexion:
+            conexion.close()
 
 def cambiar_presupuesto(user_id, presupuesto):
     conexion = create_connection()
-    
-    if not conexion:
-        return None
     
     try:
         with conexion.cursor() as cursor:
@@ -72,14 +63,12 @@ def cambiar_presupuesto(user_id, presupuesto):
         print(f"Error al cambiar presupuesto: {e}")
         raise Exception("Error de base de datos")
     finally:
-        conexion.close()
+         if conexion:
+            conexion.close()
 
 def cambiar_foto(user_id, url_foto):
     conexion = create_connection()
-    
-    if not conexion:
-        return None
-    
+
     try:
         with conexion.cursor() as cursor:
             sql = "UPDATE usuarios SET foto_perfil = %s WHERE id = %s"
@@ -91,14 +80,12 @@ def cambiar_foto(user_id, url_foto):
         print(f"Error al cambiar foto: {e}")
         raise Exception("Error de base de datos")
     finally:
-        conexion.close()
+         if conexion:
+            conexion.close()
 
 def eliminar_cuenta(user_id):
     conexion = create_connection()
-    
-    if not conexion:
-        return None
-    
+
     try:
         with conexion.cursor() as cursor:
             sql = "DELETE FROM usuarios WHERE id = %s"
@@ -110,4 +97,5 @@ def eliminar_cuenta(user_id):
         print(f"Error al eliminar cuenta: {e}")
         raise Exception("Error de base de datos")
     finally:
-        conexion.close()
+        if conexion:
+            conexion.close()

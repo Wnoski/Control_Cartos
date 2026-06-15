@@ -5,6 +5,7 @@ const formLogin = document.getElementById("formLogin");
 const emailLogin = document.getElementById("emailLogin");
 const passwordLogin = document.getElementById("passwordLogin");
 const checkboxLogin = document.getElementById("recordarLogin");
+const btnMostrar = document.getElementById("mostrarContraseña");
 
 document.addEventListener("DOMContentLoaded", comprobarToken);
 
@@ -61,5 +62,13 @@ formLogin.addEventListener("submit", async (e) => {
 
   if (conectado) {
     window.location.href = "dashboard.html";
+  }
+});
+
+btnMostrar.addEventListener("click", function () {
+  if (this.checked) {
+    passwordLogin.type = "text";
+  } else {
+    passwordLogin.type = "password";
   }
 });
