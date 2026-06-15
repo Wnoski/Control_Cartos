@@ -118,7 +118,7 @@ function renderCategorias(categorias) {
       <tr>
         <td colspan="3" class="text-center py-5 text-muted">
           <i class="bi bi-tags fs-1 d-block mb-2"></i>
-          Aún sin categorías. ¡Agrega una para poder verla, modificarla o eliminarla!
+          Aún sin categorías. ¡Agrega una para poder agregar gastos, verla, modificarla o eliminarla!
         </td>
       </tr>`;
     return;
@@ -172,11 +172,12 @@ btnAbrirAgregarCategoria.addEventListener("click", () => {
 formAgregarCategoria.addEventListener("submit", async (e) => {
   e.preventDefault();
   const datos = Object.fromEntries(new FormData(e.target));
-  const ok = await agregarCategoria(datos);
-  if (ok) {
+  const agregada = await agregarCategoria(datos);
+  if (agregada) {
     modalAgregarCategoria.hide();
     e.target.reset();
     const categorias = await obtenerCategorias();
+
     renderCategorias(categorias);
   }
 });

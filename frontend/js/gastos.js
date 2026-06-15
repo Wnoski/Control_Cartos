@@ -18,11 +18,17 @@ const btnConfirmarEliminarGasto = document.getElementById(
 const editGastoMonto = document.getElementById("editGastoMonto");
 const editGastoCategoria = document.getElementById("editGastoCategoria");
 const editGastoDescripcion = document.getElementById("editGastoDescripcion");
-const selectCategoria = document.getElementById("gastoCategoria");
+const selectCategoria = document.getElementById("selectGastoCategoria");
+const selectCategoriaOCR = document.getElementById("selectCategoriaOCR");
 
 const modalAgregarGasto = bootstrap.Modal.getOrCreateInstance(
   document.getElementById("modalAgregarGasto"),
 );
+
+const modalAgregarGastoOCR = bootstrap.Modal.getOrCreateInstance(
+  document.getElementById("modalAgregarGastoOCR"),
+);
+
 const modalEditarGasto = bootstrap.Modal.getOrCreateInstance(
   document.getElementById("modalEditarGasto"),
 );
@@ -72,6 +78,7 @@ async function obtenerCategorias() {
     });
     if (res.ok) {
       const data = await res.json();
+
       return data.data;
     }
     return null;
@@ -138,10 +145,6 @@ async function editarGasto(id, datos) {
 // 4. RENDERIZADO
 // ==========================================
 function cargarCategoriasEnSelect(select, categorias) {
-  if (!categorias || categorias.length === 0) {
-    select.innerHTML = `<option value="">Sin categorías</option>`;
-    return;
-  }
   select.innerHTML = `<option value="" selected>Elige una categoría</option>
     ${categorias.map((c) => `<option value="${c.nombre}">${c.nombre}</option>`).join("")}`;
 }
@@ -207,19 +210,35 @@ function renderGastos(gastos) {
 // ==========================================
 btnAbrirAgregarGasto.addEventListener("click", async () => {
   const categorias = await obtenerCategorias();
-  cargarCategoriasEnSelect(selectCategoria, categorias);
-  modalAgregarGasto.show();
+  if (!categorias || categorias.length !== 0) {
+    cargarCategoriasEnSelect(selectCategoria, categorias);
+    modalAgregarGasto.show();
+    return;
+  }
+  notificar(
+    "Recuerda que para agregar un gasto, primero debes tener al menos una categoría creada.",
+    "info",
+  );
 });
 
-btnAbrirAgregarGastoOCR.addEventListener("click", () => {
-  alert("OCR próximamente");
+btnAbrirAgregarGastoOCR.addEventListener("click", async () => {
+  const categoriasOCR = await obtenerCategorias();
+  if (!categoriasOCR || categoriasOCR.length !== 0) {
+    cargarCategoriasEnSelect(selectCategoriaOCR, categoriasOCR);
+    modalAgregarGastoOCR.show();
+    return;
+  }
+  notificar(
+    "Recuerda que para agregar un gasto, primero debes tener al menos una categoría creada.",
+    "info",
+  );
 });
 
 formAgregarGasto.addEventListener("submit", async (e) => {
   e.preventDefault();
   const datos = Object.fromEntries(new FormData(e.target));
-  const ok = await agregarGasto(datos);
-  if (ok) {
+  const agregado = await agregarGasto(datos);
+  if (agregado) {
     modalAgregarGasto.hide();
     e.target.reset();
     const gastos = await obtenerGastos();
@@ -271,8 +290,8 @@ bodyTablaGastos.addEventListener("click", (e) => {
 });
 
 btnConfirmarEliminarGasto.addEventListener("click", async () => {
-  const ok = await eliminarGasto(gastoIdSeleccionado);
-  if (ok) {
+  const eliminado = await eliminarGasto(gastoIdSeleccionado);
+  if (eliminado) {
     modalEliminarGasto.hide();
     const gastos = await obtenerGastos();
     renderGastos(gastos);

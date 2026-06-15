@@ -3,9 +3,18 @@
 // ==========================================
 const cardCategorias = document.getElementById("cardCategorias");
 const grafica = document.getElementById("grafica").getContext("2d");
-const divBtnGrafica = document.getElementById("divBtnsGrafica");
+const divBtnsGrafica = document.getElementById("divBtnsGrafica");
 const divBotones = document.getElementById("divBtnsAccion");
 const formAgregarGasto = document.getElementById("formAgregarGasto");
+const mensajeGrafica = document.getElementById("mensajeGrafica");
+const contenedorGrafica = document.getElementById("contenedorGrafica");
+const btnMesActual = document.getElementById("btnMesActual");
+const btnMesAnterior = document.getElementById("btnMesAnterior");
+const btnHistorico = document.getElementById("btnHistorico");
+
+const modalAgregarCategoria = bootstrap.Modal.getOrCreateInstance(
+  document.getElementById("modalAgregarCategoria"),
+);
 
 // Referencias tarjetas presupuesto
 const presupuestoMax = document.getElementById("presupuestoMax");
@@ -31,13 +40,20 @@ document.addEventListener("DOMContentLoaded", async () => {
 // ==========================================
 // 3. EVENT LISTENERS
 // ==========================================
-divBtnGrafica.addEventListener("click", async (e) => {
-  if (e.target.tagName !== "BUTTON") return;
-  e.target.id === "btnMesActual"
-    ? await obtenerDatosDashboard(token)
-    : e.target.id === "btnMesAnterior"
-      ? await obtenerGraficaAnterior(token)
-      : await obtenerGraficaHistorico(token);
+divBtnsGrafica.addEventListener("click", async (e) => {
+  const btnActivo = e.target.closest("button");
+  if (!btnActivo) return;
+
+  divBtnsGrafica.querySelector(".btn.active")?.classList.remove("active");
+  btnActivo.classList.add("active");
+
+  if (btnActivo.id === "btnMesActual") {
+    await obtenerDatosDashboard(token);
+  } else if (btnActivo.id === "btnMesAnterior") {
+    await obtenerGraficaAnterior(token);
+  } else {
+    await obtenerGraficaHistorico(token);
+  }
 });
 
 divBotones.addEventListener("click", async (e) => {
@@ -46,22 +62,38 @@ divBotones.addEventListener("click", async (e) => {
 
   switch (btn.dataset.title) {
     case "agregarGasto":
-      await cargarCategoriasEnSelect("selectCategorias");
-      bootstrap.Modal.getOrCreateInstance(
-        document.getElementById("modalAgregarGasto"),
-      ).show();
+      const cargadas = await cargarCategoriasEnSelect("selectCategorias");
+      if (cargadas) {
+        bootstrap.Modal.getOrCreateInstance(
+          document.getElementById("modalAgregarGasto"),
+        ).show();
+        break;
+      }
+      notificar(
+        "Recuerda que para agregar un gasto, primero debes tener al menos una categoría creada.",
+        "info",
+      );
       break;
     case "agregarGastoOCR":
-      await cargarCategoriasEnSelect("ocrCategoria");
-      bootstrap.Modal.getOrCreateInstance(
-        document.getElementById("modalAgregarGastoOCR"),
-      ).show();
+      const cargadasOCR = await cargarCategoriasEnSelect("ocrCategoria");
+      if (cargadasOCR) {
+        bootstrap.Modal.getOrCreateInstance(
+          document.getElementById("modalAgregarGastoOCR"),
+        ).show();
+        break;
+      }
+      notificar(
+        "Recuerda que para agregar un gasto, primero debes tener al menos una categoría creada.",
+        "info",
+      );
       break;
     case "categorias":
       window.location.href = "categorias.html";
       break;
     case "tablaGastos":
       window.location.href = "gastos.html";
+      break;
+    default:
       break;
   }
 });
@@ -72,6 +104,7 @@ formAgregarGasto.addEventListener("submit", async (e) => {
   bootstrap.Modal.getOrCreateInstance(
     document.getElementById("modalAgregarGasto"),
   ).hide();
+
   const agregado = await agregarGasto(formObj);
   if (agregado) {
     formAgregarGasto.reset();
@@ -80,13 +113,6 @@ formAgregarGasto.addEventListener("submit", async (e) => {
   } else {
     notificar("Error al agregar gasto", "error");
   }
-});
-
-ulFoto.addEventListener("click", (e) => {
-  const btnCerrar = e.target.closest(".log-out");
-  if (!btnCerrar) return;
-  localStorage.clear();
-  document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
 });
 
 // ==========================================
@@ -117,6 +143,7 @@ async function obtenerDatosDashboard(token) {
     if (res.ok) {
       const obj_res = await res.json();
       renderPresupuesto(obj_res.data);
+
       renderCategorias(obj_res.data.categorias);
       renderGrafica(obj_res.data.categorias);
       return obj_res;
@@ -162,6 +189,7 @@ async function obtenerCategorias() {
     });
     if (res.ok) {
       const obj_res = await res.json();
+
       return obj_res.data;
     }
     return null;
@@ -173,13 +201,15 @@ async function obtenerCategorias() {
 
 async function cargarCategoriasEnSelect(selectId) {
   const categorias = await obtenerCategorias();
-  const select = document.getElementById(selectId);
   if (!categorias || categorias.length === 0) {
-    select.innerHTML = `<option value="">Sin categorías</option>`;
-    return;
+    return false;
   }
+  const select = document.getElementById(selectId);
+
   select.innerHTML = `<option value="" selected>Elige una categoría</option>
     ${categorias.map((c) => `<option value="${c.nombre}">${c.nombre}</option>`).join("")}`;
+
+  return true;
 }
 
 // ==========================================
@@ -194,7 +224,7 @@ function renderPresupuesto(datos) {
         : datos.porcentaje_global >= 75
           ? "🟡 Cerca del límite"
           : datos.porcentaje_global >= 60
-            ? "🟡 Gastos "
+            ? "🟡 Precavido"
             : datos.porcentaje_global >= 40
               ? "🟢 Estable"
               : datos.porcentaje_global > 0
@@ -231,7 +261,10 @@ function renderCategorias(categorias) {
   if (!categorias || categorias.length === 0) {
     cardCategorias.innerHTML = `<div class="text-center py-5 text-muted">
           <i class="bi bi-tags fs-1 d-block mb-2"></i>
-            <p class="text-muted">Aún sin categorías. ¡Anímate a agregarlas para tener más control de tus finanzas!</p>
+            <p class="text-muted">Aún sin categorías. ¡Anímate a agregarlas para poder agregar gastos y tener más control de tus finanzas!</p>
+            <button class="btn btn-primary btn-sm" onclick="abrirModalCategoria()">
+              <i class="bi bi-plus-circle me-1"></i>Agregar categoría
+            </button>
       </div>`;
 
     return;
@@ -246,7 +279,7 @@ function renderCategorias(categorias) {
             : categoria.porcentaje >= 75
               ? "🟡 Cerca del límite"
               : categoria.porcentaje >= 60
-                ? "🟡 Buen ritmo, pero ojo con los cartos"
+                ? "🟡 Precavido"
                 : categoria.porcentaje >= 40
                   ? "🟢 Estable"
                   : categoria.porcentaje > 0
@@ -262,8 +295,8 @@ function renderCategorias(categorias) {
 
       return `<div class="mb-3">
       <div class="d-flex justify-content-between mb-1">
-        <span>${categoria.categoria}</span>
-        <span>${categoria.total_gastado}€ / ${categoria.monto_maximo}€</span>
+        <span>${categoria.nombre}</span>
+        <span>${categoria.total_gastado || 0}€ / ${categoria.monto_maximo}€</span>
       </div>
       <div class="progress" style="height:7px;">
         <div class="progress-bar ${colorBarra}" style="width:${Math.min(categoria.porcentaje, 100)}%"></div>
@@ -276,10 +309,19 @@ function renderCategorias(categorias) {
 
 function renderGrafica(datos, temporalidad) {
   if (!datos || datos.length === 0) {
-    grafica.innerHTML = `<p class="text-muted text-center mt-3">Aún sin datos para mostrar en la gráfica.</p>`;
+    mensajeGrafica.classList.remove("d-none");
+    contenedorGrafica.classList.add("d-none");
+    divBtnsGrafica.classList.add("d-none");
+    graficaInstancia?.destroy();
+    graficaInstancia = null;
     return;
   }
+
   if (graficaInstancia) graficaInstancia.destroy();
+
+  mensajeGrafica.classList.add("d-none");
+  contenedorGrafica.classList.remove("d-none");
+  divBtnsGrafica.classList.remove("d-none");
 
   const paleta = [
     "#2ecc71",
@@ -297,7 +339,7 @@ function renderGrafica(datos, temporalidad) {
     colores = "#e74c3c";
     tipo = "line";
   } else {
-    labels = datos.map((d) => d.categoria);
+    labels = datos.map((d) => d.nombre);
     gastos = datos.map((d) => d.total_gastado);
     colores = datos.map((_, i) => paleta[i % paleta.length]);
     tipo = "bar";
@@ -311,6 +353,39 @@ function renderGrafica(datos, temporalidad) {
         { label: "Gastado €", data: gastos, backgroundColor: colores },
       ],
     },
+    options: {
+      plugins: {
+        legend: {
+          display: false,
+        },
+      },
+      scales: {
+        y: {
+          title: {
+            display: true,
+            text: "Euros (€)",
+            align: "end",
+            color: "#6c757d",
+            font: {
+              size: 12,
+              weight: "bold",
+            },
+          },
+        },
+        x: {
+          title: {
+            display: true,
+            text: `${temporalidad === "historico" ? "Tiempo" : "Categorias"}`,
+            align: "end",
+            color: "#6c757d",
+            font: {
+              size: 12,
+              weight: "bold",
+            },
+          },
+        },
+      },
+    },
   });
 }
 
@@ -323,3 +398,20 @@ function procesarHistorico(datos) {
   });
   return Object.values(meses);
 }
+
+function abrirModalCategoria() {
+  modalAgregarCategoria.show();
+}
+
+formAgregarCategoria.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const datos = Object.fromEntries(new FormData(e.target));
+  const agregada = await agregarCategoria(datos);
+  if (agregada) {
+    modalAgregarCategoria.hide();
+    e.target.reset();
+    const categorias = await obtenerCategorias();
+
+    renderCategorias(categorias);
+  }
+});

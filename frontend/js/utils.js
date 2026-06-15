@@ -116,6 +116,23 @@ async function verificarTiempoToken(token) {
   }
 }
 
+async function agregarCategoria(datos) {
+  try {
+    const res = await fetch(`${URL_BASE}/categorias/`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(datos),
+    });
+    return res.ok;
+  } catch (error) {
+    console.error("Error al agregar categoria:", error);
+    return false;
+  }
+}
+
 //Cerrar Sesion
 
 ulFoto.addEventListener("click", (e) => {

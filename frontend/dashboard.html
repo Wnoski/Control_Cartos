@@ -196,7 +196,15 @@
               </button>
             </div>
           </div>
-          <canvas id="grafica"></canvas>
+          <div id="contenedorGrafica">
+            <canvas id="grafica"></canvas>
+          </div>
+          <div id="mensajeGrafica" class="text-center py-5 d-none">
+            <i class="bi bi-bar-chart-line fs-1 d-block mb-2"></i>
+            <p class="text-muted text-center mt-3">
+              Aún sin datos para mostrar en la gráfica.
+            </p>
+          </div>
         </div>
       </div>
     </main>
@@ -225,7 +233,7 @@
                 <input
                   type="number"
                   class="form-control"
-                  name="monto"
+                  name="monto_gasto"
                   placeholder="0.00"
                   step="0.01"
                 />
@@ -311,12 +319,17 @@
                   type="number"
                   class="form-control"
                   id="ocrMonto"
+                  name="monto_gasto"
                   placeholder="Se rellenará automáticamente"
                 />
               </div>
               <div class="mb-3">
                 <label class="form-label">Categoría</label>
-                <select class="form-select" id="ocrCategoria">
+                <select
+                  class="form-select"
+                  id="ocrCategoria"
+                  name="nombre_categoria"
+                >
                   <option value="">Selecciona una categoría</option>
                 </select>
               </div>
@@ -327,6 +340,7 @@
                 <input
                   type="text"
                   class="form-control"
+                  name="descripcion"
                   id="ocrDescripcion"
                   maxlength="20"
                   placeholder="Maximo 20 caracteres"
@@ -349,6 +363,70 @@
               id="btnGuardarGastoOCR"
             >
               Guardar gasto
+            </button>
+            <button
+              type="button"
+              class="btn btn-outline-secondary"
+              data-bs-dismiss="modal"
+            >
+              Cancelar
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODAL AGREGAR CATEGORIA -->
+
+    <div
+      class="modal fade"
+      id="modalAgregarCategoria"
+      tabindex="-1"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header bg-primary text-white">
+            <h5 class="modal-title">Agregar categoría</h5>
+            <button
+              type="button"
+              class="btn-close btn-close-white"
+              data-bs-dismiss="modal"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <form id="formAgregarCategoria">
+              <div class="mb-3">
+                <label class="form-label">Nombre</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  name="nombre"
+                  placeholder="Ej: Alimentación"
+                  required
+                />
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Límite mensual</label>
+                <input
+                  type="number"
+                  class="form-control"
+                  name="monto_maximo"
+                  placeholder="0.00"
+                  step="0.01"
+                  required
+                />
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="submit"
+              form="formAgregarCategoria"
+              class="btn btn-primary"
+              id="btnGuardarCategoria"
+            >
+              Guardar
             </button>
             <button
               type="button"

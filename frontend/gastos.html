@@ -168,7 +168,7 @@
                 <select
                   class="form-select"
                   name="nombre_categoria"
-                  id="gastoCategoria"
+                  id="selectGastoCategoria"
                   required
                 ></select>
               </div>
@@ -243,12 +243,17 @@
                   type="number"
                   class="form-control"
                   id="ocrMonto"
+                  name="monto_gasto"
                   placeholder="Se rellenará automáticamente"
                 />
               </div>
               <div class="mb-3">
                 <label class="form-label">Categoría</label>
-                <select class="form-select" id="ocrCategoria">
+                <select
+                  class="form-select"
+                  id="selectCategoriaOCR"
+                  name="nombre_categoria"
+                >
                   <option value="">Selecciona una categoría</option>
                 </select>
               </div>
@@ -260,6 +265,7 @@
                   type="text"
                   class="form-control"
                   id="ocrDescripcion"
+                  name="descripcion"
                   maxlength="20"
                   placeholder="Maximo 20 caracteres"
                 />

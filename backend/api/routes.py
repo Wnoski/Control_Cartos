@@ -41,9 +41,6 @@ async def solicitar_cambio_contraseña(datos: CambioRequest, token: str):
     return auth_controller.cambiar_contraseña(token, datos.new_password, datos.confirm_password)
 
 
-
-
-
 #CATEGORIAS
 
 router_categoria = APIRouter()
@@ -75,11 +72,10 @@ def obtener_gastos(user_id: int = Depends(verificar_token)):
 
 @router_gastos.post("/")
 def crear_gasto(datos: GastosRequest, user_id: int = Depends(verificar_token)):
-    return gastos_controller.crear_gasto(datos.nombre_categoria, user_id, datos.monto, datos.descripcion)
+    return gastos_controller.crear_gasto(datos.nombre_categoria, user_id, datos.monto_gasto, datos.descripcion)
 
 @router_gastos.put("/{gasto_id}")
 def editar_gasto(datos: GastosEditRequest, gasto_id: int, user_id: int = Depends(verificar_token)):
-    print("llega")
     return gastos_controller.editar_gasto(user_id, gasto_id, datos.model_dump())
 
 @router_gastos.delete("/{gasto_id}")

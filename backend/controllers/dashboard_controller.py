@@ -20,7 +20,7 @@ def obtener_dashboard(user_id):
             
             resultado_categorias.append({
                 "id": categoria["id"],
-                "categoria": categoria["nombre"],
+                "nombre": categoria["nombre"],
                 "monto_maximo": monto_maximo,
                 "total_gastado": total_gastado,
                 "porcentaje": round(porcentaje, 1),
@@ -60,7 +60,7 @@ def obtener_dashboard_mes_anterior(user_id):
             
             resultado_categorias.append({
                 "id": categoria["id"],
-                "categoria": categoria["nombre"],
+                "nombre": categoria["nombre"],
                 "monto_maximo": monto_maximo,
                 "total_gastado": total_gastado,
                 "porcentaje": round(porcentaje, 1),
@@ -85,7 +85,7 @@ def obtener_dashboard_mes_anterior(user_id):
 
 def obtener_historico(user_id):
     try:
-        historico = dashboard_model.obtener_historico_3_meses(user_id)
+        historico = dashboard_model.obtener_historico(user_id)
         return {"status": "success", "data": historico}
     except Exception as e:
         print(f"Error en historico: {e}")
