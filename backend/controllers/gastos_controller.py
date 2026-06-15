@@ -1,7 +1,7 @@
-from utils.exceptions import CredencialesError, CuentaNoVerificadaError, EmailDuplicado, TokenInvalido, UsuarioNoExiste, PasswordNoCoinciden, CategoriaNoExiste
+from utils.exceptions import CategoriaNoExiste, NoProcesado
 from fastapi import HTTPException
-from models import gastos_model, usuarios_model
-from services import ocr_service 
+from models import gastos_model
+from services import ocr_service
 from utils.exceptions import NoProcesado
 
 def crear_gasto(nombre_categoria, user_id, monto, descripcion = None):
@@ -54,10 +54,10 @@ def editar_gasto(user_id, gasto_id, datos):
         raise HTTPException(status_code=500, detail="Error interno del servidor")
     
 
-def procesar_gasto_ocr(archivo, user_id):
+def procesar_gasto_ocr(archivo):
     try:
         procesado = ocr_service.extraer_texto(archivo)
-        
+
         if not procesado:
             raise NoProcesado("No se pudo procesar el archivo, intente manualmente por favor")
         

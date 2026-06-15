@@ -1,5 +1,5 @@
 // ==========================================
-// 1. SELECCIÓN DE ELEMENTOS DEL DOM
+// 1. REFERENCIAS AL DOM
 // ==========================================
 const formLogin = document.getElementById("formLogin");
 const emailLogin = document.getElementById("emailLogin");
@@ -7,10 +7,13 @@ const passwordLogin = document.getElementById("passwordLogin");
 const checkboxLogin = document.getElementById("recordarLogin");
 const btnMostrar = document.getElementById("mostrarContraseña");
 
+// ==========================================
+// 2. INICIALIZACIÓN DE LA APP
+// ==========================================
 document.addEventListener("DOMContentLoaded", comprobarToken);
 
 // ==========================================
-// 2. FUNCIONES (Lógica / API)
+// 3. SERVICIOS Y PETICIONES API
 // ==========================================
 async function iniciarSesion(email, password, recordar = false) {
   try {
@@ -44,8 +47,10 @@ async function iniciarSesion(email, password, recordar = false) {
 }
 
 // ==========================================
-// 3. ESCUCHADORES DE EVENTOS
+// 4. EVENT LISTENERS (INTERACCIONES)
 // ==========================================
+
+// --- PROCESAR EL FORMULARIO DE LOGEO ---
 formLogin.addEventListener("submit", async (e) => {
   e.preventDefault();
 
@@ -65,6 +70,7 @@ formLogin.addEventListener("submit", async (e) => {
   }
 });
 
+// --- MOSTRAR / OCULTAR CONTRASEÑA ---
 btnMostrar.addEventListener("click", function () {
   if (this.checked) {
     passwordLogin.type = "text";

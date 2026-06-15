@@ -1,34 +1,52 @@
 // ==========================================
-// 1. REFERENCIAS AL DOM
+// 1. CONSTANTES Y ESTADO DE LA APLICACIÓN
 // ==========================================
+let token;
+let graficaInstancia = null;
+
+// ==========================================
+// 2. REFERENCIAS AL DOM
+// ==========================================
+// Contenedores y Tarjetas Principales
 const cardCategorias = document.getElementById("cardCategorias");
+const contenedorGrafica = document.getElementById("contenedorGrafica");
+const mensajeGrafica = document.getElementById("mensajeGrafica");
+const welcoName = document.getElementById("welcoName");
+
+// Elementos de la Gráfica
 const grafica = document.getElementById("grafica").getContext("2d");
 const divBtnsGrafica = document.getElementById("divBtnsGrafica");
-const divBotones = document.getElementById("divBtnsAccion");
-const formAgregarGasto = document.getElementById("formAgregarGasto");
-const mensajeGrafica = document.getElementById("mensajeGrafica");
-const contenedorGrafica = document.getElementById("contenedorGrafica");
 const btnMesActual = document.getElementById("btnMesActual");
 const btnMesAnterior = document.getElementById("btnMesAnterior");
 const btnHistorico = document.getElementById("btnHistorico");
 
-const modalAgregarCategoria = bootstrap.Modal.getOrCreateInstance(
-  document.getElementById("modalAgregarCategoria"),
-);
+// Elementos de Control y Bloques de Botones
+const divBotones = document.getElementById("divBtnsAccion");
+const btnProcesarOCR = document.getElementById("btnProcesarOCR");
 
-// Referencias tarjetas presupuesto
+// Formularios
+const formAgregarGasto = document.getElementById("formAgregarGasto");
+const formAgregarGastoOCR = document.getElementById("formAgregarGastoOCR");
+const formAgregarCategoria = document.getElementById("formAgregarCategoria");
+
+// Inputs específicos de OCR
+const ocrArchivo = document.getElementById("ocrArchivo");
+const ocrMonto = document.getElementById("ocrMonto");
+
+// Tarjetas de Presupuesto Global
 const presupuestoMax = document.getElementById("presupuestoMax");
 const totalGastado = document.getElementById("totalGastado");
 const presupuestoRestante = document.getElementById("presupuestoRestante");
 const barraGlobal = document.getElementById("barraGlobal");
 const mensajeGlobal = document.getElementById("mensajeGlobal");
-const welcoName = document.getElementById("welcoName");
 
-let token;
-let graficaInstancia = null;
+// Instancias de Modales (Bootstrap)
+const modalAgregarCategoria = bootstrap.Modal.getOrCreateInstance(
+  document.getElementById("modalAgregarCategoria"),
+);
 
 // ==========================================
-// 2. INICIALIZACIÓN
+// 3. INICIALIZACIÓN DE LA APP
 // ==========================================
 document.addEventListener("DOMContentLoaded", async () => {
   token = await comprobarToken();
@@ -38,85 +56,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 });
 
 // ==========================================
-// 3. EVENT LISTENERS
-// ==========================================
-divBtnsGrafica.addEventListener("click", async (e) => {
-  const btnActivo = e.target.closest("button");
-  if (!btnActivo) return;
-
-  divBtnsGrafica.querySelector(".btn.active")?.classList.remove("active");
-  btnActivo.classList.add("active");
-
-  if (btnActivo.id === "btnMesActual") {
-    await obtenerDatosDashboard(token);
-  } else if (btnActivo.id === "btnMesAnterior") {
-    await obtenerGraficaAnterior(token);
-  } else {
-    await obtenerGraficaHistorico(token);
-  }
-});
-
-divBotones.addEventListener("click", async (e) => {
-  const btn = e.target.closest(".btn-acciones");
-  if (!btn) return;
-
-  switch (btn.dataset.title) {
-    case "agregarGasto":
-      const cargadas = await cargarCategoriasEnSelect("selectCategorias");
-      if (cargadas) {
-        bootstrap.Modal.getOrCreateInstance(
-          document.getElementById("modalAgregarGasto"),
-        ).show();
-        break;
-      }
-      notificar(
-        "Recuerda que para agregar un gasto, primero debes tener al menos una categoría creada.",
-        "info",
-      );
-      break;
-    case "agregarGastoOCR":
-      const cargadasOCR = await cargarCategoriasEnSelect("ocrCategoria");
-      if (cargadasOCR) {
-        bootstrap.Modal.getOrCreateInstance(
-          document.getElementById("modalAgregarGastoOCR"),
-        ).show();
-        break;
-      }
-      notificar(
-        "Recuerda que para agregar un gasto, primero debes tener al menos una categoría creada.",
-        "info",
-      );
-      break;
-    case "categorias":
-      window.location.href = "categorias.html";
-      break;
-    case "tablaGastos":
-      window.location.href = "gastos.html";
-      break;
-    default:
-      break;
-  }
-});
-
-formAgregarGasto.addEventListener("submit", async (e) => {
-  e.preventDefault();
-  const formObj = Object.fromEntries(new FormData(formAgregarGasto));
-  bootstrap.Modal.getOrCreateInstance(
-    document.getElementById("modalAgregarGasto"),
-  ).hide();
-
-  const agregado = await agregarGasto(formObj);
-  if (agregado) {
-    formAgregarGasto.reset();
-    await obtenerDatosDashboard(token);
-    notificar("Gasto agregado correctamente", "success");
-  } else {
-    notificar("Error al agregar gasto", "error");
-  }
-});
-
-// ==========================================
-// 4. PETICIONES API
+// 4. SERVICIOS Y PETICIONES API
 // ==========================================
 async function agregarGasto(form) {
   try {
@@ -143,7 +83,6 @@ async function obtenerDatosDashboard(token) {
     if (res.ok) {
       const obj_res = await res.json();
       renderPresupuesto(obj_res.data);
-
       renderCategorias(obj_res.data.categorias);
       renderGrafica(obj_res.data.categorias);
       return obj_res;
@@ -189,7 +128,6 @@ async function obtenerCategorias() {
     });
     if (res.ok) {
       const obj_res = await res.json();
-
       return obj_res.data;
     }
     return null;
@@ -213,7 +151,7 @@ async function cargarCategoriasEnSelect(selectId) {
 }
 
 // ==========================================
-// 5. RENDERIZADO
+// 5. FUNCIONES DE RENDERIZADO Y HELPERS
 // ==========================================
 function renderPresupuesto(datos) {
   const mensaje =
@@ -266,9 +204,9 @@ function renderCategorias(categorias) {
               <i class="bi bi-plus-circle me-1"></i>Agregar categoría
             </button>
       </div>`;
-
     return;
   }
+
   cardCategorias.innerHTML = categorias
     .map((categoria) => {
       const mensaje =
@@ -403,6 +341,88 @@ function abrirModalCategoria() {
   modalAgregarCategoria.show();
 }
 
+// ==========================================
+// 6. EVENT LISTENERS (INTERACCIONES)
+// ==========================================
+
+// --- FILTROS DE TEMPORALIDAD DE LA GRÁFICA ---
+divBtnsGrafica.addEventListener("click", async (e) => {
+  const btnActivo = e.target.closest("button");
+  if (!btnActivo) return;
+
+  divBtnsGrafica.querySelector(".btn.active")?.classList.remove("active");
+  btnActivo.classList.add("active");
+
+  if (btnActivo.id === "btnMesActual") {
+    await obtenerDatosDashboard(token);
+  } else if (btnActivo.id === "btnMesAnterior") {
+    await obtenerGraficaAnterior(token);
+  } else {
+    await obtenerGraficaHistorico(token);
+  }
+});
+
+// --- PANEL DE ACCIONES PRINCIPALES (SWITCH) ---
+divBotones.addEventListener("click", async (e) => {
+  const btn = e.target.closest(".btn-acciones");
+  if (!btn) return;
+
+  switch (btn.dataset.title) {
+    case "agregarGasto":
+      const cargadas = await cargarCategoriasEnSelect("selectCategorias");
+      if (cargadas) {
+        bootstrap.Modal.getOrCreateInstance(
+          document.getElementById("modalAgregarGasto"),
+        ).show();
+        break;
+      }
+      notificar(
+        "Recuerda que para agregar un gasto, primero debes tener al menos una categoría creada.",
+        "info",
+      );
+      break;
+    case "agregarGastoOCR":
+      const cargadasOCR = await cargarCategoriasEnSelect("ocrCategoria");
+      if (cargadasOCR) {
+        bootstrap.Modal.getOrCreateInstance(
+          document.getElementById("modalAgregarGastoOCR"),
+        ).show();
+        break;
+      }
+      notificar(
+        "Recuerda que para agregar un gasto, primero debes tener al menos una categoría creada.",
+        "info",
+      );
+      break;
+    case "categorias":
+      window.location.href = "categorias.html";
+      break;
+    case "tablaGastos":
+      window.location.href = "gastos.html";
+      break;
+    default:
+      break;
+  }
+});
+
+// --- ENVÍO DE FORMULARIOS (SUBMIT) ---
+formAgregarGasto.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const formObj = Object.fromEntries(new FormData(formAgregarGasto));
+  bootstrap.Modal.getOrCreateInstance(
+    document.getElementById("modalAgregarGasto"),
+  ).hide();
+
+  const agregado = await agregarGasto(formObj);
+  if (agregado) {
+    formAgregarGasto.reset();
+    await obtenerDatosDashboard(token);
+    notificar("Gasto agregado correctamente", "success");
+  } else {
+    notificar("Error al agregar gasto", "error");
+  }
+});
+
 formAgregarCategoria.addEventListener("submit", async (e) => {
   e.preventDefault();
   const datos = Object.fromEntries(new FormData(e.target));
@@ -411,7 +431,63 @@ formAgregarCategoria.addEventListener("submit", async (e) => {
     modalAgregarCategoria.hide();
     e.target.reset();
     const categorias = await obtenerCategorias();
-
     renderCategorias(categorias);
+  }
+});
+
+formAgregarGastoOCR.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const formObj = Object.fromEntries(new FormData(formAgregarGastoOCR));
+
+  bootstrap.Modal.getOrCreateInstance(
+    document.getElementById("modalAgregarGastoOCR"),
+  ).hide();
+
+  const agregado = await agregarGasto(formObj);
+  if (agregado) {
+    formAgregarGastoOCR.reset();
+    await obtenerDatosDashboard(token);
+    notificar("Gasto agregado correctamente", "success");
+  } else {
+    notificar("Error al agregar gasto", "error");
+  }
+});
+
+// --- ESCANEO DE DOCUMENTOS POR OCR ---
+btnProcesarOCR.addEventListener("click", async () => {
+  const archivo = ocrArchivo.files[0];
+
+  if (!archivo) {
+    notificar("Selecciona un archivo primero", "warning");
+    return;
+  }
+
+  const formData = new FormData();
+  formData.append("archivo", archivo);
+
+  try {
+    const res = await fetch(`${URL_BASE}/gastos/procesar-ocr`, {
+      method: "POST",
+      headers: { Authorization: `Bearer ${token}` },
+      body: formData,
+    });
+    const data = await res.json();
+
+    if (res.ok) {
+      if (data.data) {
+        ocrMonto.value = data.data;
+        notificar("Monto extraído correctamente", "success");
+      } else {
+        notificar(
+          "No se pudo procesar el archivo, introduzca los datos manualmente por favor",
+          "warning",
+        );
+      }
+    } else if (res.status === 400) {
+      notificar(data.detail, "warning");
+    }
+  } catch (error) {
+    console.error("Error al procesar OCR:", error);
+    notificar("Error al procesar el archivo", "error");
   }
 });

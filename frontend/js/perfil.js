@@ -1,32 +1,44 @@
 // ==========================================
-// 1. CONSTANTES Y REFERENCIAS AL DOM
+// 1. CONSTANTES Y ESTADO DE LA APLICACIÓN
 // ==========================================
-
 let token;
 
+// ==========================================
+// 2. REFERENCIAS AL DOM
+// ==========================================
+// Información del Perfil (Visualización)
 const fotoPerfil = document.getElementById("fotoPerfil");
 const nombreUsuario = document.getElementById("nombreUsuario");
 const emailUsuario = document.getElementById("emailUsuario");
+
+// Sección: Actualizar Foto e Información Básica
 const inputFoto = document.getElementById("inputFoto");
 const nuevoNickname = document.getElementById("nuevoNickname");
 const btnGuardarNickname = document.getElementById("btnGuardarNickname");
+
+// Sección: Cambio de Contraseña
 const passwordActual = document.getElementById("passwordActual");
 const passwordNueva = document.getElementById("passwordNueva");
 const passwordConfirmar = document.getElementById("passwordConfirmar");
 const btnGuardarPassword = document.getElementById("btnGuardarPassword");
+const btnMostrar = document.getElementById("mostrarContraseña");
+
+// Sección: Presupuesto
 const nuevoPresupuesto = document.getElementById("nuevoPresupuesto");
 const btnGuardarPresupuesto = document.getElementById("btnGuardarPresupuesto");
+
+// Sección: Peligro / Eliminar Cuenta
 const btnConfirmarEliminarCuenta = document.getElementById(
   "btnConfirmarEliminarCuenta",
 );
-const btnMostrar = document.getElementById("mostrarContraseña");
 
+// Instancias de Modales (Bootstrap)
 const modalEliminarCuenta = bootstrap.Modal.getOrCreateInstance(
   document.getElementById("modalEliminarCuenta"),
 );
 
 // ==========================================
-// 2. INICIALIZACIÓN
+// 3. INICIALIZACIÓN DE LA APP
 // ==========================================
 document.addEventListener("DOMContentLoaded", async () => {
   token = await comprobarToken();
@@ -36,9 +48,8 @@ document.addEventListener("DOMContentLoaded", async () => {
 });
 
 // ==========================================
-// 3. LÓGICA CENTRAL Y PETICIONES API
+// 4. SERVICIOS Y PETICIONES API
 // ==========================================
-
 async function obtenerDatosPerfil() {
   try {
     const res = await fetch(`${URL_BASE}/perfil/`, {
@@ -142,7 +153,7 @@ async function eliminarCuenta() {
 }
 
 // ==========================================
-// 4. RENDERIZADO
+// 5. FUNCIONES DE RENDERIZADO DOM
 // ==========================================
 function renderPerfil(perfil) {
   if (!perfil) return;
@@ -156,8 +167,23 @@ function renderPerfil(perfil) {
 }
 
 // ==========================================
-// 5. EVENT LISTENERS
+// 6. EVENT LISTENERS (INTERACCIONES)
 // ==========================================
+
+// --- ACTUALIZAR FOTO DE PERFIL ---
+inputFoto.addEventListener("change", async (e) => {
+  const foto = e.target.files[0];
+  if (!foto) return;
+  const data = await cambiarFoto(foto);
+  if (data) {
+    fotoPerfil.src = `${URL_BASE}/${data.url}`;
+    notificar("Foto actualizada correctamente", "success");
+  } else {
+    notificar("Error al cambiar la foto", "error");
+  }
+});
+
+// --- GUARDAR NUEVO NICKNAME ---
 btnGuardarNickname.addEventListener("click", async () => {
   const nick = nuevoNickname.value.trim();
   if (!nick) return;
@@ -171,6 +197,7 @@ btnGuardarNickname.addEventListener("click", async () => {
   }
 });
 
+// --- ACTUALIZAR CONTRASEÑA ---
 btnGuardarPassword.addEventListener("click", async () => {
   const actual = passwordActual.value.trim();
   const nueva = passwordNueva.value.trim();
@@ -195,35 +222,38 @@ btnGuardarPassword.addEventListener("click", async () => {
   }
 });
 
+// --- MOSTRAR / OCULTAR CONTRASEÑAS ---
+btnMostrar.addEventListener("click", function () {
+  if (this.checked) {
+    passwordActual.type = "text";
+    passwordNueva.type = "text";
+    passwordConfirmar.type = "text";
+  } else {
+    passwordActual.type = "password";
+    passwordNueva.type = "password";
+    passwordConfirmar.type = "password";
+  }
+});
+
+// --- GUARDAR PRESUPUESTO ---
 btnGuardarPresupuesto.addEventListener("click", async () => {
   const presupuesto = nuevoPresupuesto.value.trim();
   if (!presupuesto) return;
   const ok = await cambiarPresupuesto(presupuesto);
   if (ok) {
-    notificar("Presupuesto actualizado correctamente", "success");
+    notificar("Presupuesto updated correctamente", "success");
   } else {
     notificar("Error al cambiar el presupuesto", "error");
   }
 });
 
-inputFoto.addEventListener("change", async (e) => {
-  const foto = e.target.files[0];
-  if (!foto) return;
-  const data = await cambiarFoto(foto);
-  if (data) {
-    fotoPerfil.src = `${URL_BASE}/${data.url}`;
-    notificar("Foto actualizada correctamente", "success");
-  } else {
-    notificar("Error al cambiar la foto", "error");
-  }
-});
-
+// --- CONFIRMACIÓN DE ELIMINAR CUENTA ---
 btnConfirmarEliminarCuenta.addEventListener("click", async () => {
   btnConfirmarEliminarCuenta.disabled = true;
   const eliminada = await eliminarCuenta();
   if (eliminada) {
     notificar(
-      "Cuenta eliminada correctamente, Esperamos verte de nuevo por aqui, puedes registrarse nuevamente cuando quieras",
+      "Cuenta eliminada correctamente, Esperamos volver a verte por aqui, puedes registrarte nuevamente cuando quieras",
       "success",
     );
     document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
@@ -234,17 +264,5 @@ btnConfirmarEliminarCuenta.addEventListener("click", async () => {
   } else {
     btnConfirmarEliminarCuenta.disabled = false;
     notificar("Error al eliminar la cuenta", "error");
-  }
-});
-
-btnMostrar.addEventListener("click", function () {
-  if (this.checked) {
-    passwordActual.type = "text";
-    passwordNueva.type = "text";
-    passwordConfirmar.type = "text";
-  } else {
-    passwordActual.type = "password";
-    passwordNueva.type = "password";
-    passwordConfirmar.type = "password";
   }
 });

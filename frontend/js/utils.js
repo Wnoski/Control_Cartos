@@ -1,7 +1,17 @@
+// ==========================================
+// 1. CONFIGURACIÓN Y CONSTANTES GLOBALES
+// ==========================================
 const URL_BASE = "http://127.0.0.1:8000";
+
+// ==========================================
+// 2. REFERENCIAS AL DOM
+// ==========================================
 const fotoDropdown = document.getElementById("fotoDropdown");
 const ulFoto = document.getElementById("ul-foto");
 
+// ==========================================
+// 3. CONTROL DE ACCESO Y AUTENTICACIÓN
+// ==========================================
 async function comprobarToken() {
   const cookieToken = obtenerCookie("token");
   const localToken = localStorage.getItem("token");
@@ -42,6 +52,35 @@ async function comprobarToken() {
   }
 }
 
+function obtenerCookie(nombre) {
+  const cookies = document.cookie.split(";");
+  const cookie = cookies.find((c) => c.trim().startsWith(nombre));
+  return cookie ? cookie.split("=")[1] : null;
+}
+
+async function verificarTiempoToken(token) {
+  try {
+    const res = await fetch(`${URL_BASE}/usuarios/tiempo-token`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
+    if (!res.ok) {
+      const obj_res = await res.json();
+      localStorage.removeItem("token");
+      window.location.href = "index.html";
+      return false;
+    }
+
+    return true;
+  } catch (error) {
+    console.error("Error de red:", error);
+    return false;
+  }
+}
+
+// ==========================================
+// 4. SERVICIOS Y PETICIONES API
+// ==========================================
 async function obtenerDatosPerfil(token) {
   try {
     const res = await fetch(`${URL_BASE}/perfil/`, {
@@ -49,7 +88,6 @@ async function obtenerDatosPerfil(token) {
     });
     if (res.ok) {
       const data = await res.json();
-
       renderPerfil(data.data);
     }
   } catch (error) {
@@ -57,6 +95,26 @@ async function obtenerDatosPerfil(token) {
   }
 }
 
+async function agregarCategoria(datos) {
+  try {
+    const res = await fetch(`${URL_BASE}/categorias/`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(datos),
+    });
+    return res.ok;
+  } catch (error) {
+    console.error("Error al agregar categoria:", error);
+    return false;
+  }
+}
+
+// ==========================================
+// 5. COMPONENTES VISUALES Y RENDERIZADO
+// ==========================================
 function renderPerfil(perfil) {
   if (!perfil) return;
   const fotoDropdown = document.getElementById("fotoDropdown");
@@ -90,51 +148,11 @@ function notificar(mensaje, tipo = "success") {
   setTimeout(() => alerta.remove(), 5000);
 }
 
-function obtenerCookie(nombre) {
-  const cookies = document.cookie.split(";");
-  const cookie = cookies.find((c) => c.trim().startsWith(nombre));
-  return cookie ? cookie.split("=")[1] : null;
-}
+// ==========================================
+// 6. EVENT LISTENERS (INTERACCIONES)
+// ==========================================
 
-async function verificarTiempoToken(token) {
-  try {
-    const res = await fetch(`${URL_BASE}/usuarios/tiempo-token`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-
-    if (!res.ok) {
-      const obj_res = await res.json();
-      localStorage.removeItem("token");
-      window.location.href = "index.html";
-      return false;
-    }
-
-    return true;
-  } catch (error) {
-    console.error("Error de red:", error);
-    return false;
-  }
-}
-
-async function agregarCategoria(datos) {
-  try {
-    const res = await fetch(`${URL_BASE}/categorias/`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify(datos),
-    });
-    return res.ok;
-  } catch (error) {
-    console.error("Error al agregar categoria:", error);
-    return false;
-  }
-}
-
-//Cerrar Sesion
-
+// --- CERRAR SESIÓN ---
 ulFoto.addEventListener("click", (e) => {
   const btnCerrar = e.target.closest(".log-out");
   if (!btnCerrar) return;

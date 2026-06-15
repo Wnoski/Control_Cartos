@@ -49,7 +49,7 @@ async def crear_usuario(datos):
             raise EmailDuplicado("El email ya está registrado")
         
         password_hasheado = pwd_context.hash(datos.password)
-        imagen_perfil = "/uploads/fotos/default_avatar.avif"
+        imagen_perfil = "uploads/fotos/default_avatar.avif"
         token_verificacion = secrets.token_urlsafe(32)
         nuevo = usuarios_model.crear_usuario(
             nombre_usuario = datos.nickname,

@@ -1,12 +1,30 @@
+// ==========================================
+// 1. CONSTANTES Y ESTADO DE LA APLICACIÓN
+// ==========================================
+let categoriaIdSeleccionada = null;
+let dataTable = null;
+
+// ==========================================
+// 2. REFERENCIAS AL DOM
+// ==========================================
+// Tablas y Contenedores
+const tablaCategorias = document.getElementById("tablaCategorias");
+
+// Formularios
+const formAgregarCategoria = document.getElementById("formAgregarCategoria");
+const formEditarCategoria = document.getElementById("formEditarCategoria");
+
+// Botones de Acción
 const btnAbrirAgregarCategoria = document.getElementById(
   "btnAbrirAgregarCategoria",
 );
-const formAgregarCategoria = document.getElementById("formAgregarCategoria");
-const tablaCategorias = document.getElementById("tablaCategorias");
-const formEditarCategoria = document.getElementById("formEditarCategoria");
 const btnConfirmarEliminar = document.getElementById("btnConfirmarEliminar");
+
+// Inputs de Formulario
 const editCategoriaNombre = document.getElementById("editCategoriaNombre");
 const editCategoriaMonto = document.getElementById("editCategoriaMonto");
+
+// Instancias de Modales (Bootstrap)
 const modalAgregarCategoria = bootstrap.Modal.getOrCreateInstance(
   document.getElementById("modalAgregarCategoria"),
 );
@@ -17,10 +35,8 @@ const modalEliminarCategoria = bootstrap.Modal.getOrCreateInstance(
   document.getElementById("modalEliminarCategoria"),
 );
 
-let categoriaIdSeleccionada = null;
-let dataTable = null;
 // ==========================================
-// 1. INICIALIZACIÓN
+// 3. INICIALIZACIÓN DE LA APP
 // ==========================================
 document.addEventListener("DOMContentLoaded", async () => {
   token = await comprobarToken();
@@ -35,7 +51,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 });
 
 // ==========================================
-// 2. LÓGICA CENTRAL Y PETICIONES API
+// 4. SERVICIOS Y PETICIONES API
 // ==========================================
 async function obtenerCategorias() {
   try {
@@ -101,7 +117,7 @@ async function eliminarCategoria(id) {
 }
 
 // ==========================================
-// 3. RENDERIZADO
+// 5. FUNCIONES DE RENDERIZADO DOM
 // ==========================================
 function renderCategorias(categorias) {
   if (dataTable) {
@@ -163,25 +179,15 @@ function renderCategorias(categorias) {
 }
 
 // ==========================================
-// 5. EVENT LISTENERS
+// 6. EVENT LISTENERS (INTERACCIONES)
 // ==========================================
+
+// --- CONTROL DE APERTURA DE MODALES ---
 btnAbrirAgregarCategoria.addEventListener("click", () => {
   modalAgregarCategoria.show();
 });
 
-formAgregarCategoria.addEventListener("submit", async (e) => {
-  e.preventDefault();
-  const datos = Object.fromEntries(new FormData(e.target));
-  const agregada = await agregarCategoria(datos);
-  if (agregada) {
-    modalAgregarCategoria.hide();
-    e.target.reset();
-    const categorias = await obtenerCategorias();
-
-    renderCategorias(categorias);
-  }
-});
-
+// --- ACCIONES EN LA TABLA (EDITAR / ELIMINAR) ---
 tablaCategorias.addEventListener("click", (e) => {
   const btnEditar = e.target.closest(".btn-editar");
   const btnEliminar = e.target.closest(".btn-eliminar");
@@ -199,6 +205,19 @@ tablaCategorias.addEventListener("click", (e) => {
   }
 });
 
+// --- ENVÍO DE FORMULARIOS (SUBMIT) ---
+formAgregarCategoria.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const datos = Object.fromEntries(new FormData(e.target));
+  const agregada = await agregarCategoria(datos);
+  if (agregada) {
+    modalAgregarCategoria.hide();
+    e.target.reset();
+    const categorias = await obtenerCategorias();
+    renderCategorias(categorias);
+  }
+});
+
 formEditarCategoria.addEventListener("submit", async (e) => {
   e.preventDefault();
   const datos = Object.fromEntries(new FormData(e.target));
@@ -206,8 +225,8 @@ formEditarCategoria.addEventListener("submit", async (e) => {
   if (editada) {
     notificar("Categoría editada correctamente.", "success");
     modalEditarCategoria.hide();
-    const categorias = await obtenerCategorias();
-    renderCategorias(categorias);
+    const categories = await obtenerCategorias();
+    renderCategorias(categories);
   } else {
     notificar(
       "Error al editar categoría. Por favor, intente nuevamente.",
@@ -216,6 +235,7 @@ formEditarCategoria.addEventListener("submit", async (e) => {
   }
 });
 
+// --- CONFIRMACIÓN DE ELIMINACIÓN ---
 btnConfirmarEliminar.addEventListener("click", async () => {
   const eliminada = await eliminarCategoria(categoriaIdSeleccionada);
   if (eliminada) {

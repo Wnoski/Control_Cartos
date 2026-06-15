@@ -1,8 +1,44 @@
+// ==========================================
+// 1. REFERENCIAS AL DOM
+// ==========================================
 const form = document.getElementById("formRecuperar");
 const nPassword = document.getElementById("newPassword");
 const confirmPassword = document.getElementById("confirmPassword");
 const btnMostrar = document.getElementById("mostrarContraseña");
 
+// ==========================================
+// 2. FUNCIONES Y PETICIONES API
+// ==========================================
+function extraerToken() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const token = urlParams.get("token");
+  return token;
+}
+
+async function cambiarContraseña(token, new_password, confirm_password) {
+  try {
+    const res = await fetch(`${URL_BASE}/usuarios/cambiar/${token}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ new_password, confirm_password }),
+    });
+
+    if (res.ok) {
+      return true;
+    }
+
+    return false;
+  } catch (error) {
+    console.error("Error al intentar cambiar la contraseña", error);
+    return false;
+  }
+}
+
+// ==========================================
+// 3. EVENT LISTENERS (INTERACCIONES)
+// ==========================================
+
+// --- PROCESAR EL CAMBIO DE CONTRASEÑA ---
 form.addEventListener("submit", async (e) => {
   e.preventDefault();
 
@@ -53,31 +89,7 @@ form.addEventListener("submit", async (e) => {
   }
 });
 
-function extraerToken() {
-  const urlParams = new URLSearchParams(window.location.search);
-  const token = urlParams.get("token");
-  return token;
-}
-
-async function cambiarContraseña(token, new_password, confirm_password) {
-  try {
-    const res = await fetch(`${URL_BASE}/usuarios/cambiar/${token}`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ new_password, confirm_password }),
-    });
-
-    if (res.ok) {
-      return true;
-    }
-
-    return false;
-  } catch (error) {
-    console.error("Error al intentar cambiar la contraseña", error);
-    return false;
-  }
-}
-
+// --- MOSTRAR / OCULTAR CONTRASEÑAS ---
 btnMostrar.addEventListener("click", function () {
   if (this.checked) {
     nPassword.type = "text";

@@ -1,3 +1,12 @@
+// ==========================================
+// 1. REFERENCIAS AL DOM
+// ==========================================
+const divVerificado = document.getElementById("divVerificado");
+const divError = document.getElementById("divError");
+
+// ==========================================
+// 2. INICIALIZACIÓN DE LA APP
+// ==========================================
 document.addEventListener("DOMContentLoaded", async () => {
   const token = extraerToken();
   if (token) {
@@ -9,9 +18,9 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 });
 
-const divVerificado = document.getElementById("divVerificado");
-const divError = document.getElementById("divError");
-
+// ==========================================
+// 3. SERVICIOS Y PETICIONES API
+// ==========================================
 function extraerToken() {
   const urlParams = new URLSearchParams(window.location.search);
   const token = urlParams.get("token");

@@ -1,6 +1,34 @@
+// ==========================================
+// 1. REFERENCIAS AL DOM
+// ==========================================
 const inputEmail = document.getElementById("email");
 const btnEnviar = document.getElementById("btnEnviar");
 
+// ==========================================
+// 2. SERVICIOS Y PETICIONES API
+// ==========================================
+async function enviarCorreoRecuperacion(email) {
+  try {
+    const res = await fetch(`${URL_BASE}/usuarios/olvidar`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ email }),
+    });
+
+    if (res.ok) {
+      return true;
+    }
+    return false;
+  } catch (error) {
+    console.error("Error al intentar enviar correo de recuperacion:", error);
+  }
+}
+
+// ==========================================
+// 3. EVENT LISTENERS (INTERACCIONES)
+// ==========================================
 btnEnviar.addEventListener("click", async () => {
   const email = inputEmail.value.trim();
 
@@ -24,22 +52,3 @@ btnEnviar.addEventListener("click", async () => {
     );
   }
 });
-
-async function enviarCorreoRecuperacion(email) {
-  try {
-    const res = await fetch(`${URL_BASE}/usuarios/olvidar`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ email }),
-    });
-
-    if (res.ok) {
-      return true;
-    }
-    return false;
-  } catch (error) {
-    console.error("Error al intentar enviar correo de recuperacion:", error);
-  }
-}

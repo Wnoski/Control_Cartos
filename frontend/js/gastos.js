@@ -1,13 +1,22 @@
 // ==========================================
-// 1. CONSTANTES Y REFERENCIAS AL DOM
+// 1. CONSTANTES Y ESTADO DE LA APLICACIÓN
 // ==========================================
 let token;
 let gastoIdSeleccionado = null;
 let dataTable = null;
 
+// ==========================================
+// 2. REFERENCIAS AL DOM
+// ==========================================
+// Tablas y Contenedores
 const bodyTablaGastos = document.getElementById("bodyTablaGastos");
+
+// Formularios
 const formAgregarGasto = document.getElementById("formAgregarGasto");
 const formEditarGasto = document.getElementById("formEditarGasto");
+const formAgregarGastoOCR = document.getElementById("formAgregarGastoOCR");
+
+// Botones de Apertura y Acción
 const btnAbrirAgregarGasto = document.getElementById("btnAbrirAgregarGasto");
 const btnAbrirAgregarGastoOCR = document.getElementById(
   "btnAbrirAgregarGastoOCR",
@@ -15,20 +24,24 @@ const btnAbrirAgregarGastoOCR = document.getElementById(
 const btnConfirmarEliminarGasto = document.getElementById(
   "btnConfirmarEliminarGasto",
 );
+const btnProcesarOCR = document.getElementById("btnProcesarOCR");
+
+// Inputs y Selects de Formulario
+const ocrArchivo = document.getElementById("ocrArchivo");
+const ocrMonto = document.getElementById("ocrMonto");
 const editGastoMonto = document.getElementById("editGastoMonto");
 const editGastoCategoria = document.getElementById("editGastoCategoria");
 const editGastoDescripcion = document.getElementById("editGastoDescripcion");
 const selectCategoria = document.getElementById("selectGastoCategoria");
 const selectCategoriaOCR = document.getElementById("selectCategoriaOCR");
 
+// Instancias de Modales (Bootstrap)
 const modalAgregarGasto = bootstrap.Modal.getOrCreateInstance(
   document.getElementById("modalAgregarGasto"),
 );
-
 const modalAgregarGastoOCR = bootstrap.Modal.getOrCreateInstance(
   document.getElementById("modalAgregarGastoOCR"),
 );
-
 const modalEditarGasto = bootstrap.Modal.getOrCreateInstance(
   document.getElementById("modalEditarGasto"),
 );
@@ -37,7 +50,7 @@ const modalEliminarGasto = bootstrap.Modal.getOrCreateInstance(
 );
 
 // ==========================================
-// 2. INICIALIZACIÓN
+// 3. INICIALIZACIÓN DE LA APP
 // ==========================================
 document.addEventListener("DOMContentLoaded", async () => {
   token = await comprobarToken();
@@ -47,13 +60,14 @@ document.addEventListener("DOMContentLoaded", async () => {
     obtenerCategorias(),
     obtenerDatosPerfil(token),
   ]);
+
   cargarCategoriasEnSelect(selectCategoria, categorias);
   renderPerfil(perfil);
   renderGastos(gastos);
 });
 
 // ==========================================
-// 3. LÓGICA CENTRAL Y PETICIONES API
+// 4. SERVICIOS Y PETICIONES API
 // ==========================================
 async function obtenerGastos() {
   try {
@@ -78,7 +92,6 @@ async function obtenerCategorias() {
     });
     if (res.ok) {
       const data = await res.json();
-
       return data.data;
     }
     return null;
@@ -105,6 +118,27 @@ async function agregarGasto(datos) {
   }
 }
 
+async function editarGasto(id, datos) {
+  try {
+    const res = await fetch(`${URL_BASE}/gastos/${id}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(datos),
+    });
+    if (res.ok) {
+      return true;
+    }
+    notificar("Error al editar gasto", "error");
+    return false;
+  } catch (error) {
+    console.error("Error al editar gasto:", error);
+    return false;
+  }
+}
+
 async function eliminarGasto(id) {
   try {
     const res = await fetch(`${URL_BASE}/gastos/${id}`, {
@@ -118,31 +152,8 @@ async function eliminarGasto(id) {
   }
 }
 
-async function editarGasto(id, datos) {
-  try {
-    const res = await fetch(`${URL_BASE}/gastos/${id}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-
-      body: JSON.stringify(datos),
-    });
-    if (res.ok) {
-      return true;
-    }
-    notificar("Error al editar gasto", "error");
-    return false;
-  } catch (error) {
-    console.error("Error al editar gasto:", error);
-
-    return false;
-  }
-}
-
 // ==========================================
-// 4. RENDERIZADO
+// 5. FUNCIONES DE RENDERIZADO DOM
 // ==========================================
 function cargarCategoriasEnSelect(select, categorias) {
   select.innerHTML = `<option value="" selected>Elige una categoría</option>
@@ -206,8 +217,10 @@ function renderGastos(gastos) {
 }
 
 // ==========================================
-// 5. EVENT LISTENERS
+// 6. EVENT LISTENERS (INTERACCIONES)
 // ==========================================
+
+// --- CONTROL DE APERTURA DE MODALES ---
 btnAbrirAgregarGasto.addEventListener("click", async () => {
   const categorias = await obtenerCategorias();
   if (!categorias || categorias.length !== 0) {
@@ -222,9 +235,9 @@ btnAbrirAgregarGasto.addEventListener("click", async () => {
 });
 
 btnAbrirAgregarGastoOCR.addEventListener("click", async () => {
-  const categoriasOCR = await obtenerCategorias();
-  if (!categoriasOCR || categoriasOCR.length !== 0) {
-    cargarCategoriasEnSelect(selectCategoriaOCR, categoriasOCR);
+  const categoriesOCR = await obtenerCategorias();
+  if (!categoriesOCR || categoriesOCR.length !== 0) {
+    cargarCategoriasEnSelect(selectCategoriaOCR, categoriesOCR);
     modalAgregarGastoOCR.show();
     return;
   }
@@ -234,6 +247,7 @@ btnAbrirAgregarGastoOCR.addEventListener("click", async () => {
   );
 });
 
+// --- FLUJO AGREGAR Y EDITAR GASTO MANUAL ---
 formAgregarGasto.addEventListener("submit", async (e) => {
   e.preventDefault();
   const datos = Object.fromEntries(new FormData(e.target));
@@ -246,6 +260,21 @@ formAgregarGasto.addEventListener("submit", async (e) => {
   }
 });
 
+formEditarGasto.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const formData = new FormData(e.target);
+  const datos = Object.fromEntries(formData);
+
+  const editado = await editarGasto(gastoIdSeleccionado, datos);
+  if (editado) {
+    notificar("Gasto actualizado correctamente", "success");
+    modalEditarGasto.hide();
+    const gastos = await obtenerGastos();
+    renderGastos(gastos);
+  }
+});
+
+// --- ACCIONES EN LA TABLA (EDITAR / ELIMINAR) ---
 bodyTablaGastos.addEventListener("click", async (e) => {
   const btnEliminar = e.target.closest(".btn-eliminar-gasto");
   const btnEditar = e.target.closest(".btn-editar-gasto");
@@ -266,21 +295,6 @@ bodyTablaGastos.addEventListener("click", async (e) => {
   }
 });
 
-formEditarGasto.addEventListener("submit", async (e) => {
-  e.preventDefault();
-
-  const formData = new FormData(e.target);
-  const datos = Object.fromEntries(formData);
-
-  const editado = await editarGasto(gastoIdSeleccionado, datos);
-  if (editado) {
-    notificar("Gasto actualizado correctamente", "success");
-    modalEditarGasto.hide();
-    const gastos = await obtenerGastos();
-    renderGastos(gastos);
-  }
-});
-
 bodyTablaGastos.addEventListener("click", (e) => {
   const btnEliminar = e.target.closest(".btn-eliminar-gasto");
   if (btnEliminar) {
@@ -295,5 +309,63 @@ btnConfirmarEliminarGasto.addEventListener("click", async () => {
     modalEliminarGasto.hide();
     const gastos = await obtenerGastos();
     renderGastos(gastos);
+  }
+});
+
+// --- FLUJO ESCANEO Y GUARDADO POR OCR ---
+btnProcesarOCR.addEventListener("click", async () => {
+  const archivo = ocrArchivo.files[0];
+
+  if (!archivo) {
+    notificar("Selecciona un archivo primero", "warning");
+    return;
+  }
+
+  const formData = new FormData();
+  formData.append("archivo", archivo);
+
+  try {
+    const res = await fetch(`${URL_BASE}/gastos/procesar-ocr`, {
+      method: "POST",
+      headers: { Authorization: `Bearer ${token}` },
+      body: formData,
+    });
+    const data = await res.json();
+
+    if (res.ok) {
+      if (data.data) {
+        ocrMonto.value = data.data;
+        notificar("Monto extraído correctamente", "success");
+      } else {
+        notificar(
+          "No se pudo procesar el archivo, introduzca los datos manualmente por favor",
+          "warning",
+        );
+      }
+    } else if (res.status === 400) {
+      notificar(data.detail, "warning");
+    }
+  } catch (error) {
+    console.error("Error al procesar OCR:", error);
+    notificar("Error al procesar el archivo", "error");
+  }
+});
+
+formAgregarGastoOCR.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const formObj = Object.fromEntries(new FormData(formAgregarGastoOCR));
+
+  bootstrap.Modal.getOrCreateInstance(
+    document.getElementById("modalAgregarGastoOCR"),
+  ).hide();
+
+  const agregado = await agregarGasto(formObj);
+  if (agregado) {
+    formAgregarGastoOCR.reset();
+    const gastos = await obtenerGastos();
+    renderGastos(gastos);
+    notificar("Gasto agregado correctamente", "success");
+  } else {
+    notificar("Error al agregar gasto", "error");
   }
 });

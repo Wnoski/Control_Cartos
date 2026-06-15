@@ -1,8 +1,7 @@
 import pytesseract
 import fitz
 import io
-import parseo_service
-from utils.exceptions import NoProcesado
+from services import parseo_service
 from PIL import Image, ImageFilter, ImageEnhance
 from pathlib import Path
 
@@ -18,13 +17,15 @@ def extraer_texto(archivo):
         contenido_bytes = archivo.file.read()
 
         if extension == ".pdf":
+            
             texto = extraer_texto_pdf(contenido_bytes)
+            
         else:
+            
             imagen = Image.open(io.BytesIO(contenido_bytes))
             texto = extraer_texto_imagen(imagen)
-
-        monto = parseo_service.extraer_monto(texto)
-        
+            
+        monto = parseo_service.extraer_monto(texto) 
         return monto
     
 
