@@ -1,6 +1,8 @@
 from utils.exceptions import CredencialesError, CuentaNoVerificadaError, EmailDuplicado, TokenInvalido, UsuarioNoExiste, PasswordNoCoinciden, CategoriaNoExiste
 from fastapi import HTTPException
-from models import gastos_model
+from models import gastos_model, usuarios_model
+from services import ocr_service 
+from utils.exceptions import NoProcesado
 
 def crear_gasto(nombre_categoria, user_id, monto, descripcion = None):
     try:
@@ -12,11 +14,11 @@ def crear_gasto(nombre_categoria, user_id, monto, descripcion = None):
         gastos_model.crear_gasto(user_id, id_categoria, monto, descripcion)
         
         return {
-            "status": "succes"
+            "status": "success"
         }
         
-    except CategoriaNoExiste:
-        raise
+    except CategoriaNoExiste as e:
+        raise HTTPException(status_code=400, detail=str(e))
     
     except Exception as e:
         print(f"Error en el controller gasto: {e}")
@@ -52,3 +54,21 @@ def editar_gasto(user_id, gasto_id, datos):
         raise HTTPException(status_code=500, detail="Error interno del servidor")
     
 
+def procesar_gasto_ocr(archivo, user_id):
+    try:
+        procesado = ocr_service.extraer_texto(archivo)
+        
+        if not procesado:
+            raise NoProcesado("No se pudo procesar el archivo, intente manualmente por favor")
+        
+        return {
+            "status":"success",
+            "data": procesado
+        }
+        
+    except NoProcesado as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    
+    except Exception as e:
+        print(f"Error al procesar OCR: {e}")
+        raise HTTPException(status_code=500, detail="Error interno del servidor")

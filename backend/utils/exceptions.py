@@ -19,3 +19,6 @@ class PasswordNoCoinciden(Exception):
 
 class CategoriaNoExiste(Exception):
     pass
+
+class NoProcesado(Exception):
+    pass

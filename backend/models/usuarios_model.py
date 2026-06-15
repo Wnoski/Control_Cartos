@@ -76,4 +76,5 @@ def cambiar_contraseña(new_password, user_id):
     finally:
         if conexion:
             conexion.close()
+
     

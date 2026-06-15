@@ -8,7 +8,6 @@ router_usuario = APIRouter()
 
 #USER
 
-    
 @router_usuario.post("/register")
 async def usuario_regis(datos: RegisterRequest):
     return await auth_controller.crear_usuario(datos)
@@ -73,6 +72,10 @@ def obtener_gastos(user_id: int = Depends(verificar_token)):
 @router_gastos.post("/")
 def crear_gasto(datos: GastosRequest, user_id: int = Depends(verificar_token)):
     return gastos_controller.crear_gasto(datos.nombre_categoria, user_id, datos.monto_gasto, datos.descripcion)
+
+@router_gastos.post("/procesar-ocr")
+def procesar_gasto(archivo: UploadFile = File(...), user_id: int = Depends(verificar_token)):
+    return gastos_controller.procesar_gasto_ocr(archivo)
 
 @router_gastos.put("/{gasto_id}")
 def editar_gasto(datos: GastosEditRequest, gasto_id: int, user_id: int = Depends(verificar_token)):
