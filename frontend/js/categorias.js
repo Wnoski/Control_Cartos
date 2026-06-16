@@ -211,11 +211,14 @@ formAgregarCategoria.addEventListener("submit", async (e) => {
   const datos = Object.fromEntries(new FormData(e.target));
   const agregada = await agregarCategoria(datos);
   if (agregada) {
+    notificar("Categoria agregada correctamente", "success");
     modalAgregarCategoria.hide();
     e.target.reset();
     const categorias = await obtenerCategorias();
     renderCategorias(categorias);
+    return;
   }
+  notificar("Error al intentar agregar categoria", "error");
 });
 
 formEditarCategoria.addEventListener("submit", async (e) => {
