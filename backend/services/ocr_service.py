@@ -8,7 +8,6 @@ from pathlib import Path
 pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
 
 
-
 def extraer_texto(archivo):
     
         nombre_archivo = archivo.filename
