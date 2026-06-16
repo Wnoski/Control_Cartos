@@ -1,0 +1,179 @@
+/* ==========================================
+   VARIABLES Y CONFIGURACIÓN GLOBAL
+   ========================================== */
+:root {
+  --color-primary: #0d6efd;
+  --color-success: #2ecc71;
+  --color-danger: #dc3545;
+  --color-warning: #ffc107;
+  --color-dark: #212529;
+  --color-bg: #f8f9fa;
+  --color-white: #ffffff;
+  --color-muted: #6c757d;
+  --color-border: #dee2e6;
+  --font-main: "Sora", sans-serif;
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1);
+  --radius: 10px;
+}
+
+/* ==========================================
+   BASE
+   ========================================== */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: var(--font-main);
+  background-color: var(--color-bg);
+  color: var(--color-dark);
+  margin: 0;
+}
+
+/* ==========================================
+   NAVBAR
+   ========================================== */
+.navbar {
+  box-shadow: var(--shadow-sm);
+}
+
+.navbar .text-success {
+  color: var(--color-success) !important;
+}
+
+.img_logo {
+  height: 32px;
+  width: auto;
+  border-radius: 6px;
+}
+
+/* ==========================================
+   CARDS
+   ========================================== */
+.card {
+  border-radius: var(--radius);
+  border: none;
+  box-shadow: var(--shadow-sm);
+}
+
+.card-title {
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+/* ==========================================
+   FORMULARIOS
+   ========================================== */
+.form-control,
+.form-select {
+  border-radius: 8px;
+  border-color: var(--color-border);
+  font-family: var(--font-main);
+  font-size: 0.9rem;
+}
+
+.form-control:focus,
+.form-select:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.15);
+}
+
+.form-label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--color-dark);
+}
+
+/* ==========================================
+   BOTONES
+   ========================================== */
+.btn {
+  font-family: var(--font-main);
+  font-weight: 500;
+  border-radius: 8px;
+}
+
+/* ==========================================
+   TABLAS
+   ========================================== */
+.table {
+  font-size: 0.9rem;
+}
+
+.table thead th {
+  font-weight: 600;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--color-muted);
+}
+
+/* ==========================================
+   TÍTULO DE LA APP (LOGIN, REGISTRO, ETC.)
+   ========================================== */
+.app-title {
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.app-title span {
+  color: var(--color-success);
+}
+
+/* ==========================================
+   PÁGINAS DE AUTENTICACIÓN
+   ========================================== */
+.auth-card {
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-md);
+  padding: 2rem;
+  background: var(--color-white);
+}
+
+/* ==========================================
+   NOTIFICACIONES
+   ========================================== */
+.alert {
+  border-radius: 8px;
+  font-size: 0.9rem;
+  z-index: 9999;
+}
+
+/* ==========================================
+   BARRAS DE PROGRESO
+   ========================================== */
+.progress {
+  border-radius: 99px;
+}
+
+.progress-bar {
+  border-radius: 99px;
+}
+
+/* ==========================================
+   FOTO DE PERFIL
+   ========================================== */
+.foto-perfil {
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+/* ==========================================
+   RESPONSIVE
+   ========================================== */
+@media (max-width: 576px) {
+  .img_logo {
+    height: 28px;
+  }
+
+  .auth-card {
+    padding: 1.5rem;
+  }
+}
+
+/* CARRUSEL */
+.img-carousel {
+  max-height: 500px;
+  object-fit: cover;
+}
