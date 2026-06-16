@@ -5,5 +5,5 @@ Para instalar las librerías ejecuta:
 
 **Credenciales de prueba:**
 
-- Usuario: evaluador@proyecto.com
+- Usuario: evaluador@gmail.com
 - Clave: probar
