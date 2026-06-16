@@ -166,7 +166,10 @@ function renderGastos(gastos) {
     dataTable = null;
   }
 
+  const thead = document.querySelector("thead");
+
   if (!gastos || gastos.length === 0) {
+    thead.classList.add("d-none");
     bodyTablaGastos.innerHTML = `
       <tr>
         <td colspan="5" class="text-center py-5 text-muted">
@@ -177,6 +180,7 @@ function renderGastos(gastos) {
     return;
   }
 
+  thead.classList.remove("d-none");
   bodyTablaGastos.innerHTML = gastos
     .map(
       (g) => `
@@ -306,10 +310,13 @@ bodyTablaGastos.addEventListener("click", (e) => {
 btnConfirmarEliminarGasto.addEventListener("click", async () => {
   const eliminado = await eliminarGasto(gastoIdSeleccionado);
   if (eliminado) {
+    notificar("Gasto eliminado correctamente", "success");
     modalEliminarGasto.hide();
     const gastos = await obtenerGastos();
     renderGastos(gastos);
+    return;
   }
+  notificar("Error al intentar eliminar el gasto", "error");
 });
 
 // --- FLUJO ESCANEO Y GUARDADO POR OCR ---

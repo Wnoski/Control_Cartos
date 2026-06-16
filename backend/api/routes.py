@@ -5,7 +5,6 @@ from utils.auth import verificar_token
 
 router_usuario = APIRouter()
 
-
 #USER
 
 @router_usuario.post("/register")

@@ -239,9 +239,9 @@ btnMostrar.addEventListener("click", function () {
 btnGuardarPresupuesto.addEventListener("click", async () => {
   const presupuesto = nuevoPresupuesto.value.trim();
   if (!presupuesto) return;
-  const ok = await cambiarPresupuesto(presupuesto);
-  if (ok) {
-    notificar("Presupuesto updated correctamente", "success");
+  const editado = await cambiarPresupuesto(presupuesto);
+  if (editado) {
+    notificar("Presupuesto editado correctamente", "success");
   } else {
     notificar("Error al cambiar el presupuesto", "error");
   }

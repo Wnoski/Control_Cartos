@@ -8,7 +8,7 @@ from pathlib import Path
 pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
 
 
-# Orquestador principal - recibe el archivo del front, guarda y extrae texto
+
 def extraer_texto(archivo):
     
         nombre_archivo = archivo.filename
@@ -29,7 +29,6 @@ def extraer_texto(archivo):
         return monto
     
 
-# Extrae texto de PDF, primero digital luego OCR si es escaneado
 def extraer_texto_pdf(bytes_pdf):
     doc = fitz.open(stream=bytes_pdf, filetype="pdf")
     texto = ""
@@ -46,12 +45,10 @@ def extraer_texto_pdf(bytes_pdf):
 
     return texto
 
-# Preprocesa y extrae texto de una imagen con Tesseract
 def extraer_texto_imagen(imagen):
     imagen = preprocesar_imagen(imagen)
     return pytesseract.image_to_string(imagen, lang="spa")
 
-# Preprocesa la imagen para mejorar resultados del OCR
 def preprocesar_imagen(imagen):
     imagen = imagen.convert("L")
     imagen = ImageEnhance.Contrast(imagen).enhance(2.0)
